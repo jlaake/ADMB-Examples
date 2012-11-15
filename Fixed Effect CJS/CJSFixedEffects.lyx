@@ -102,7 +102,11 @@ p
 \shape italic
 n
 \shape default
- animals and a column for each of the K sampling occasions.
+ animals and a column for each of the 
+\shape italic
+m
+\shape default
+ sampling occasions.
  Let 
 \begin_inset Formula $\omega_{i}$
 \end_inset
@@ -245,7 +249,11 @@ he probability death occurs after occasion d is represented as
 \end_inset
 
  if the animal was not released after the last occasion seen (loss on capture)
- or m, meaning the animal survived through the entire sampling period.
+ or 
+\shape italic
+m
+\shape default
+, meaning the animal survived through the entire sampling period.
  The probability of the capture history 
 \begin_inset Formula $Pr(\omega_{i})=Pr(\omega_{i}|\, f_{i})=\sum_{d=l_{i}}^{k_{i}}Pr(\omega_{i}|\, f_{i},\, d)Pr(d\,|\, f_{i})$
 \end_inset
@@ -430,9 +438,15 @@ https://github.com/jlaake/marked
 \end_layout
 
 \begin_layout Standard
-The DATA_SECTION contains the number of capture histories (n), the number
- of capture occasions (m), and the capture history matrix (ch(i=1,n;j=1,m)
- (
+The DATA_SECTION contains the number of capture histories (
+\shape italic
+n
+\shape default
+), the number of capture occasions (
+\shape italic
+m
+\shape default
+), and the capture history matrix (ch(i=1,n;j=1,m) (
 \begin_inset Formula $\omega_{ij}$
 \end_inset
 
@@ -453,8 +467,16 @@ The DATA_SECTION contains the number of capture histories (n), the number
 
 ) for each capture history and a 0/1 indicator (loc) whether the animal
  was not released after the last occasion (i.e., loss on capture).
- Following is tint(i=1,n;j=1,m-1), a matrix of time intervals between occasions
- used to scale survival to standard unit.
+ Following is tint(i=1,
+\shape italic
+n
+\shape default
+;j=1,
+\shape italic
+m
+\shape default
+-1), a matrix of time intervals between occasions used to scale survival
+ to standard unit.
  The time interval can differ for each animal, although normally they will
  be constant for animals but may differ for occasions.
  The remainder of the section is 
@@ -474,7 +496,15 @@ p
 \begin_inset Formula $X_{p}$
 \end_inset
 
- pdm(i=1,n(m-1);j=1,kp) and 
+ pdm(i=1,
+\shape italic
+n
+\shape default
+(
+\shape italic
+m
+\shape default
+-1);j=1,kp) and 
 \begin_inset Formula $\phi$
 \end_inset
 
@@ -482,8 +512,16 @@ p
 \begin_inset Formula $X_{\phi}$
 \end_inset
 
-phidm(i=1,n(m-1);j=1,kphi)) which have a column for each modeled animal-occasion
- for 
+phidm(i=1,
+\shape italic
+n
+\shape default
+(
+\shape italic
+m
+\shape default
+-1);j=1,kphi)) which have a column for each modeled animal-occasion for
+ 
 \shape italic
 p
 \shape default
@@ -569,8 +607,19 @@ ecapture
 \series bold
 m
 \series default
-odel) function in marked which creates the admbcjs.dat file and uses R2admb
- to run the model and read the results file.
+odel) function in marked (
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/jlaake/marked
+\end_layout
+
+\end_inset
+
+)which creates the admbcjs.dat file and uses R2admb to run the model and
+ read the results file.
  The following code and results show the fitted model with marked and with
  MARK (
 \begin_inset CommandInset citation
