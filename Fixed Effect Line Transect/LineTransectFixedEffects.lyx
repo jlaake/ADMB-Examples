@@ -13,6 +13,7 @@
 %\setlength{\topmargin}{0.0in} \setlength{\textwidth}{6.5in}
 %\setlength{\textheight}{9in} \setlength{\topskip}{0in}
 %\setlength{\headheight}{0in} \setlength{\headsep}{0in}
+\usepackage{pdflscape}
 \end_preamble
 \use_default_options false
 \begin_modules
@@ -280,51 +281,15 @@ prepare_admb()
 \end_layout
 
 \begin_layout Standard
-To make this generally useful we can structure the DATA section to allow
- any number of parameters and any number of columns for the design matrix
- for each parameter.
+To make this generally useful we can structure the DATA section of the tpl
+ file to allow any number of parameters and any number of columns for the
+ design matrix for each parameter.
  This approach easily generalizes for any non-linear model where the parameters
  are expressed as a linear function of the covariates on the link-scale.
- For this specific example, we also need to specify which detection function
- to use because that defines which parameters are estimated.
- The following are the DATA and PARAMETER sections of distcov.tpl:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
-\begin_inset Graphics
-	filename ../../R2admb/Intro to R2admb/paste3.PNG
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-DATA and PARAMETER sections of distcov.tpl.
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-The input data are:
+ For this specific example in distcov.tpl (shown at end of document), we
+ also need to specify which detection function to use because that defines
+ which parameters are estimated.
+ The input data are:
 \end_layout
 
 \begin_layout Itemize
@@ -375,39 +340,18 @@ The PROCEDURE section distcov.tpl contains two functions:
 \end_layout
 
 \begin_layout Itemize
-reals (Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:reals function"
-
-\end_inset
-
-) which computes the real parameters from design matrix, beta parameters
+reals: which computes the real parameters from design matrix, beta parameters
  and the specified link function; additional links could be easily added.
 \end_layout
 
 \begin_layout Itemize
-fct (Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:fct function"
-
-\end_inset
-
-) which computes the value of the detection function for a specified distance
- and real parameter vector; additional detection functions could be easily
- added as well.
+fct: which computes the value of the detection function for a specified
+ distance and real parameter vector; additional detection functions could
+ be easily added as well.
 \end_layout
 
 \begin_layout Standard
-The calculation of the objective function (Figure 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "fig:PROCEDURE"
-
-\end_inset
-
-) has 2 loops.
+The calculation of the objective function has 2 loops.
  The first loops over the each parameter type and creates the real parameters
  for each observation and stores the values in the column of parmat for
  each parameter type.
@@ -820,36 +764,74 @@ model4
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
+\begin_inset ERT
 status open
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename ../../R2admb/Intro to R2admb/paste4.PNG
-
-\end_inset
 
 
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:reals function"
-
-\end_inset
-
-Function reals in PROCEDURE section of distcov.tpl.
+\backslash
+begin{landscape}
 \end_layout
 
 \end_inset
 
 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+lstset{% general command to set parameter(s)
+\end_layout
+
+\begin_layout Plain Layout
+
+basicstyle=
+\backslash
+tiny, % print whole listing small
+\end_layout
+
+\begin_layout Plain Layout
+
+keywordstyle=
+\backslash
+color{black}
+\backslash
+bfseries
+\backslash
+underbar,
+\end_layout
+
+\begin_layout Plain Layout
+
+% underlined bold black keywords
+\end_layout
+
+\begin_layout Plain Layout
+
+identifierstyle=, % nothing happens
+\end_layout
+
+\begin_layout Plain Layout
+
+commentstyle=
+\backslash
+color{white}, % white comments
+\end_layout
+
+\begin_layout Plain Layout
+
+stringstyle=
+\backslash
+ttfamily, % typewriter type for strings
+\end_layout
+
+\begin_layout Plain Layout
+
+showstringspaces=false}
 \end_layout
 
 \end_inset
@@ -858,36 +840,271 @@ Function reals in PROCEDURE section of distcov.tpl.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
+\begin_inset listings
+inline false
 status open
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename ../../R2admb/Intro to R2admb/paste5.PNG
-
-\end_inset
-
-
+DATA_SECTION
 \end_layout
 
 \begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:fct function"
-
-\end_inset
-
-Function fct in PROCEDURE section of distcov.tpl.
+   init_int n;                        // number of distances
 \end_layout
 
-\end_inset
+\begin_layout Plain Layout
+   init_vector xs(1,n);               // distances
+\end_layout
 
+\begin_layout Plain Layout
+   init_number width;                 // truncation half-width of transect
+\end_layout
 
+\begin_layout Plain Layout
+   init_int ifct;                     // type of detection function 1=hn,
+ 2=haz
+\end_layout
+
+\begin_layout Plain Layout
+   init_int pt;                       // number of parameter types
+\end_layout
+
+\begin_layout Plain Layout
+   init_ivector links(1,pt);          // link number but would rather use
+ strings; not sure how 1=identity, 2=log, 3=logit
+\end_layout
+
+\begin_layout Plain Layout
+   init_ivector k(1,pt);              // vector of number of parameters
+ for each type; cols in design matrix
+\end_layout
+
+\begin_layout Plain Layout
+   init_3darray dm(1,pt,1,n,1,k);     // design matrices - one for each
+ parameter type
+\end_layout
+
+\begin_layout Plain Layout
+PARAMETER_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+   init_matrix beta(1,pt,1,k);        // beta parameters for each parameter
+ type
+\end_layout
+
+\begin_layout Plain Layout
+   matrix parmat(1,pt,1,n);           // matrix of parameter values; 1 to
+ n and 1 to pt types of parameters
+\end_layout
+
+\begin_layout Plain Layout
+   vector par;                        // holds par for an observation likelihood
+ calculation
+\end_layout
+
+\begin_layout Plain Layout
+   number mu;                         // holds single integral fct(x)
+\end_layout
+
+\begin_layout Plain Layout
+   objective_function_value f;        // negative log-likelihood
+\end_layout
+
+\begin_layout Plain Layout
+PROCEDURE_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+   int i, j;
+\end_layout
+
+\begin_layout Plain Layout
+// Create matrix of real parameter values which is pt rows and n columns
+\end_layout
+
+\begin_layout Plain Layout
+   for (i=1;i<=pt;i++)
+\end_layout
+
+\begin_layout Plain Layout
+   {
+\end_layout
+
+\begin_layout Plain Layout
+    parmat(i)=reals(dm(i),beta(i),links(i));
+\end_layout
+
+\begin_layout Plain Layout
+   }
+\end_layout
+
+\begin_layout Plain Layout
+// loop over each observation computing sum of log-likelihood values
+\end_layout
+
+\begin_layout Plain Layout
+   f=0;
+\end_layout
+
+\begin_layout Plain Layout
+   for (j=1;j<=n;j++)
+\end_layout
+
+\begin_layout Plain Layout
+   {
+\end_layout
+
+\begin_layout Plain Layout
+      par=column(parmat,j);
+\end_layout
+
+\begin_layout Plain Layout
+      mu=adromb(&model_parameters::fct,0,width,8);
+\end_layout
+
+\begin_layout Plain Layout
+      f+= -log(fct(xs(j))) + log(mu);
+\end_layout
+
+\begin_layout Plain Layout
+   }  
+\end_layout
+
+\begin_layout Plain Layout
+   
+\end_layout
+
+\begin_layout Plain Layout
+//////////////////////////////   
+\end_layout
+
+\begin_layout Plain Layout
+// Computes reals from betas
+\end_layout
+
+\begin_layout Plain Layout
+//////////////////////////////   
+\end_layout
+
+\begin_layout Plain Layout
+FUNCTION dvar_vector reals(dmatrix& dm, dvar_vector& beta, int ilink)
+\end_layout
+
+\begin_layout Plain Layout
+// dm is the design matrix
+\end_layout
+
+\begin_layout Plain Layout
+// beta is vector of parameters - length macthes ncol(dm)
+\end_layout
+
+\begin_layout Plain Layout
+// ilink is type of link function
+\end_layout
+
+\begin_layout Plain Layout
+    dvar_vector tmp;
+\end_layout
+
+\begin_layout Plain Layout
+	if(ilink==1)
+\end_layout
+
+\begin_layout Plain Layout
+        tmp=dm*beta;
+\end_layout
+
+\begin_layout Plain Layout
+    if(ilink==2)
+\end_layout
+
+\begin_layout Plain Layout
+        tmp=exp(dm*beta);
+\end_layout
+
+\begin_layout Plain Layout
+    if(ilink==3)
+\end_layout
+
+\begin_layout Plain Layout
+        tmp=1/(1+exp(-dm*beta));
+\end_layout
+
+\begin_layout Plain Layout
+    return tmp;
+\end_layout
+
+\begin_layout Plain Layout
+//////////////////////////////////////////////////////////   	
+\end_layout
+
+\begin_layout Plain Layout
+// Computes normalizing constant int fct(x) - 0 to width
+\end_layout
+
+\begin_layout Plain Layout
+//////////////////////////////////////////////////////////   	
+\end_layout
+
+\begin_layout Plain Layout
+FUNCTION dvariable fct(const dvariable& x)
+\end_layout
+
+\begin_layout Plain Layout
+// x is integration variable
+\end_layout
+
+\begin_layout Plain Layout
+// ifct is index for function read from data
+\end_layout
+
+\begin_layout Plain Layout
+   dvariable tmp;
+\end_layout
+
+\begin_layout Plain Layout
+   if(ifct==1)
+\end_layout
+
+\begin_layout Plain Layout
+     tmp=exp(-.5*x*x/(par(1)*par(1)));
+\end_layout
+
+\begin_layout Plain Layout
+   if(ifct==2)
+\end_layout
+
+\begin_layout Plain Layout
+   {
+\end_layout
+
+\begin_layout Plain Layout
+     if(x<0.0000001)
+\end_layout
+
+\begin_layout Plain Layout
+	   tmp=1;
+\end_layout
+
+\begin_layout Plain Layout
+	 else
+\end_layout
+
+\begin_layout Plain Layout
+       tmp=1-exp(-(pow(x/par(1),-(1+par(2)))));
+\end_layout
+
+\begin_layout Plain Layout
+   }
+\end_layout
+
+\begin_layout Plain Layout
+   return tmp;
+\end_layout
+
+\begin_layout Plain Layout
+   
 \end_layout
 
 \end_inset
@@ -896,36 +1113,14 @@ Function fct in PROCEDURE section of distcov.tpl.
 \end_layout
 
 \begin_layout Standard
-\begin_inset Float figure
-wide false
-sideways false
+\begin_inset ERT
 status open
 
 \begin_layout Plain Layout
-\begin_inset Graphics
-	filename ../../R2admb/Intro to R2admb/paste6.PNG
-
-\end_inset
 
 
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption
-
-\begin_layout Plain Layout
-\begin_inset CommandInset label
-LatexCommand label
-name "fig:PROCEDURE"
-
-\end_inset
-
-PROCEDURE section of distcov.tpl.
-\end_layout
-
-\end_inset
-
-
+\backslash
+end{landscape}
 \end_layout
 
 \end_inset

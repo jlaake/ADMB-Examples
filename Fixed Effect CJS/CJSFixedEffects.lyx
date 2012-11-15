@@ -587,8 +587,7 @@ key "Laake2008"
 \end_inset
 
 ).
- The function prepare_admb() is a function in my personal library that does
- the equivalent to setup_admb() in R2admb and a little more.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -597,7 +596,7 @@ status open
 
 \begin_layout Plain Layout
 
-<<>>=
+<<echo=FALSE>>=
 \end_layout
 
 \begin_layout Plain Layout
@@ -608,6 +607,25 @@ prepare_admb()
 \begin_layout Plain Layout
 
 if(length(grep("RMark",.packages()))!=0)detach("package:RMark")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
 \end_layout
 
 \begin_layout Plain Layout
