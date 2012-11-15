@@ -187,8 +187,17 @@ p
 \end_layout
 
 \begin_layout Standard
-Inclusion of the covariates uses the same approach as the lm example above,
- in which the design matrix for the parameter is input as data.
+Covariates that explain differences in detectability as a function of distance
+ can be incorporated into the scale parameter 
+\begin_inset Formula $\sigma$
+\end_inset
+
+ with a design matrix with a log-link to ensure 
+\begin_inset Formula $\sigma>0$
+\end_inset
+
+.
+ The design matrix for each parameter is input as data.
  For example, if 
 \begin_inset Formula $\sigma$
 \end_inset
@@ -274,8 +283,10 @@ prepare_admb()
 To make this generally useful we can structure the DATA section to allow
  any number of parameters and any number of columns for the design matrix
  for each parameter.
- Also, for this specific example we need to specify which detection function
- to use.
+ This approach easily generalizes for any non-linear model where the parameters
+ are expressed as a linear function of the covariates on the link-scale.
+ For this specific example, we also need to specify which detection function
+ to use because that defines which parameters are estimated.
  The following are the DATA and PARAMETER sections of distcov.tpl:
 \end_layout
 
@@ -287,7 +298,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename ../../../git/R2admb/Intro to R2admb/paste3.PNG
+	filename ../../R2admb/Intro to R2admb/paste3.PNG
 
 \end_inset
 
@@ -816,7 +827,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename ../../../git/R2admb/Intro to R2admb/paste4.PNG
+	filename ../../R2admb/Intro to R2admb/paste4.PNG
 
 \end_inset
 
@@ -854,7 +865,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename ../../../git/R2admb/Intro to R2admb/paste5.PNG
+	filename ../../R2admb/Intro to R2admb/paste5.PNG
 
 \end_inset
 
@@ -892,7 +903,7 @@ status open
 
 \begin_layout Plain Layout
 \begin_inset Graphics
-	filename ../../../git/R2admb/Intro to R2admb/paste6.PNG
+	filename ../../R2admb/Intro to R2admb/paste6.PNG
 
 \end_inset
 
