@@ -15,7 +15,8 @@ chmat=cbind(rep(1,n),seen*alive)
 ch=apply(chmat,1,paste,collapse="")
 # Create dataframe with ch values
 test=data.frame(ch=ch,stringsAsFactors=FALSE)
-# attach marked package
+# detach RMark if attached and attach marked package
+if(length(grep("RMark",.packages()))!=0)detach("package:RMark")
 library(marked)
 # process data frame but don't accumulate same capture histories
 test.proc=process.data(test,model="cjs",begin.time=1,accumulate=F)

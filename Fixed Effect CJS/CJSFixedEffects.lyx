@@ -1,0 +1,1241 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+\usepackage{amsthm}\usepackage{epsfig}\usepackage{psfrag}\usepackage{lineno}
+
+\bibliographystyle{apalike}
+
+%\setlength{\evensidemargin}{0in} \setlength{\oddsidemargin}{0in}
+%\setlength{\topmargin}{0.0in} \setlength{\textwidth}{6.5in}
+%\setlength{\textheight}{9in} \setlength{\topskip}{0in}
+%\setlength{\headheight}{0in} \setlength{\headsep}{0in}
+\usepackage{pdflscape}
+\end_preamble
+\use_default_options false
+\begin_modules
+sweave
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 1
+\use_mhchem 0
+\use_mathdots 0
+\cite_engine natbib_authoryear
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Fitting Cormack-Jolly-Seber Models to Capture-Recapture Data with ADMB and
+ R2admb
+\end_layout
+
+\begin_layout Author
+Jeff Laake
+\end_layout
+
+\begin_layout Standard
+Cormack-Jolly-Seber models are often used to estimate survival from release-reca
+pture data in which animals are marked and released and then possibly recaptured
+ at a set of discrete sampling occasions if they survive.
+ Specification of a CJS model includes defining a model for 
+\shape italic
+p
+\shape default
+, capture probability and 
+\begin_inset Formula $\phi$
+\end_inset
+
+, survival probability.
+ The basic data are a matrix of capture histories with a row for each of
+ the 
+\shape italic
+n
+\shape default
+ animals and a column for each of the K sampling occasions.
+ Let 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+ be the capture history for the 
+\begin_inset Formula $i^{th}$
+\end_inset
+
+ animal.
+ It is a vector of m values (
+\begin_inset Formula $\omega_{i1},\omega_{i2},...,\omega_{im})$
+\end_inset
+
+ where 
+\begin_inset Formula $\omega_{ij}$
+\end_inset
+
+ is 1 if animal 
+\shape italic
+i
+\shape default
+ was initially released or captured on occasion 
+\shape italic
+j
+\shape default
+ and 0 otherwise.
+ Let 
+\begin_inset Formula $f_{i}$
+\end_inset
+
+ be the occasion the animal was released and 
+\begin_inset Formula $l_{i}$
+\end_inset
+
+ the last occasion the animal was seen.
+ The CJS likelihood conditions on the first occasion when the animal is
+ released.
+ Following 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "Pledger2003"
+
+\end_inset
+
+, the probability of a particular capture can be composed hierarchically
+ by conditioning on an unknown time of death and summing over the possible
+ times of death.
+ Let 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $Pr(\omega_{i}|\, f_{i},\, d)$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ be the probability of observing the capture history given death occurred
+ in the time interval after occasion 
+\shape italic
+d
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+.
+ T
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+he probability death occurs after occasion d is represented as
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\begin_inset Formula $Pr(d\,|\, f_{i})$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+.
+ The possible times of death are those after the last occasion the animal
+ was seen until the last possible occasion 
+\begin_inset Formula $k_{i}$
+\end_inset
+
+ which is 
+\begin_inset Formula $l_{i}$
+\end_inset
+
+ if the animal was not released after the last occasion seen (loss on capture)
+ or m, meaning the animal survived through the entire sampling period.
+ The probability of the capture history 
+\begin_inset Formula $Pr(\omega_{i})=Pr(\omega_{i}|\, f_{i})=\sum_{d=l_{i}}^{k_{i}}Pr(\omega_{i}|\, f_{i},\, d)Pr(d\,|\, f_{i})$
+\end_inset
+
+ implicitly depends on the first release occasion but it is dropped from
+ the notation.
+ The probability of a capture history expressed as a function of the parameters
+ 
+\begin_inset Formula $p_{ij}$
+\end_inset
+
+ for capture probability of the 
+\begin_inset Formula $i^{th}$
+\end_inset
+
+ animal on occasion 
+\shape italic
+j
+\shape default
+ and 
+\begin_inset Formula $\phi_{ij}$
+\end_inset
+
+ for survival probability of the 
+\begin_inset Formula $i^{th}$
+\end_inset
+
+ animal between occasion 
+\shape italic
+j
+\shape default
+ and 
+\shape italic
+j+1
+\shape default
+ is:
+\begin_inset Formula 
+\[
+Pr(\omega_{i})=\sum_{d=l_{i}}^{k_{i}}\;\prod_{j=f_{i}+1}^{d}p_{ij}^{\omega_{ij}}(1-p_{ij})^{(1-\omega_{ij})}\left(\prod_{j=f}^{d-1}\phi_{ij}\right)(1-\phi_{id})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The log-likelihood is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+lnL={\displaystyle \sum_{i=1}^{n}ln(Pr(\omega_{i}))}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+but it can also be expressed as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+lnL={\displaystyle \sum_{i=1}^{n'}r_{i}ln(Pr(\omega_{i}))}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\shape italic
+n' 
+\shape default
+is the number of unique values which includes the capture history and covariates
+ used for the model and 
+\begin_inset Formula $r_{i}$
+\end_inset
+
+ is the frequency.
+\end_layout
+
+\begin_layout Standard
+Models are specified for 
+\shape italic
+p
+\shape default
+ and 
+\begin_inset Formula $\phi$
+\end_inset
+
+ as linear functions of covariates for a particular link function that restricts
+ the parameters to the unit interval.
+ Let 
+\begin_inset Formula $X_{\phi}$
+\end_inset
+
+and 
+\begin_inset Formula $X_{p}$
+\end_inset
+
+ be the design matrices and 
+\begin_inset Formula $\beta_{\phi}$
+\end_inset
+
+and 
+\begin_inset Formula $\beta_{p}$
+\end_inset
+
+ be the parameter vectors.
+ The design matrices have 
+\shape italic
+n
+\shape default
+(
+\shape italic
+K
+\shape default
+-1) rows and a column for each parameter.
+ Using the logit link, 
+\begin_inset Formula $\phi=[1+\exp(-X_{\phi}\beta_{\phi})]^{-1}$
+\end_inset
+
+ and 
+\begin_inset Formula $p=[1+\exp(-X_{p}\beta_{p})]^{-1}$
+\end_inset
+
+.
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+The design matrices are easily created using an appropriate data frame and
+ a formula with model.matrix in R.
+ The code for generating the necessary data frame, model structure and running
+ the model has been implemented into an R package called marked (
+\family default
+\series default
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/jlaake/marked
+\end_layout
+
+\end_inset
+
+
+\shape default
+) that is a work in progress.
+ Here I describe the admbcjs.tpl file shown at the end of this document and
+ provide an example.
+\end_layout
+
+\begin_layout Standard
+The DATA_SECTION contains the number of capture histories (n), the number
+ of capture occasions (m), and the capture history matrix (ch(i=1,n;j=1,m)
+ (
+\begin_inset Formula $\omega_{ij}$
+\end_inset
+
+) of 0 or 1 values.
+ From the capture history the first occasion (frst 
+\begin_inset Formula $f_{i}$
+\end_inset
+
+) (and last occasion (lst 
+\begin_inset Formula $l_{i}$
+\end_inset
+
+) that each animal was seen is provided for the summation indices.
+ They are computed in the function process.ch in marked.
+ Next a vector of frequencies (frq 
+\begin_inset Formula $r_{i}$
+\end_inset
+
+) for each capture history and a 0/1 indicator (loc) whether the animal
+ was not released after the last occasion (i.e., loss on capture).
+ Following is tint(i=1,n;j=1,m-1), a matrix of time intervals between occasions
+ used to scale survival to standard unit.
+ The time interval can differ for each animal, although normally they will
+ be constant for animals but may differ for occasions.
+ The remainder of the section is 
+\begin_inset Quotes eld
+\end_inset
+
+data
+\begin_inset Quotes erd
+\end_inset
+
+ about the model structure.
+ It includes the design matrices for 
+\shape italic
+p
+\shape default
+ (
+\begin_inset Formula $X_{p}$
+\end_inset
+
+ pdm(i=1,n(m-1);j=1,kp) and 
+\begin_inset Formula $\phi$
+\end_inset
+
+(
+\begin_inset Formula $X_{\phi}$
+\end_inset
+
+phidm(i=1,n(m-1);j=1,kphi)) which have a column for each modeled animal-occasion
+ for 
+\shape italic
+p
+\shape default
+ and animal-interval for 
+\begin_inset Formula $\phi$
+\end_inset
+
+ and a column for each parameter.
+ The final optional input allows specific real values (inverse-logit) of
+ 
+\shape italic
+p
+\shape default
+ and 
+\begin_inset Formula $\phi$
+\end_inset
+
+ to be fixed.
+ The structure is an index into the design matrix and the fixed real value.
+\end_layout
+
+\begin_layout Standard
+The PARAMETER_SECTION includes the parameter vectors for 
+\begin_inset Formula $\phi$
+\end_inset
+
+(
+\begin_inset Formula $\beta_{\phi}$
+\end_inset
+
+ phibeta (j=1,kphi)) and 
+\shape italic
+p
+\shape default
+\size normal
+ 
+\size default
+(
+\begin_inset Formula $\beta_{p}$
+\end_inset
+
+ pbeta (j=1,kp)).
+ The remainder defines temporary variables that are used in the calculation
+ of the likelihood.
+ Note that the vector phi has 
+\shape italic
+m
+\shape default
+ real values with phi(m)=0 instead of m-1 to handle survival to the last
+ occasion in the calculation.
+\end_layout
+
+\begin_layout Standard
+The PROCEDURE_SECTION follows the equations defined above.
+ The complete set of real values for 
+\begin_inset Formula $\phi$
+\end_inset
+
+(phix) and 
+\shape italic
+p
+\shape default
+\size normal
+ (px) are calculated at the any fixed values are set.
+ Using those real parameter values the probability of each capture history
+ is computed and the -log-likelihood.
+ If the computed probability of a capture history is 0, it is set to a very
+ small value to avoid log(0) issues.
+\end_layout
+
+\begin_layout Standard
+As an example, I use the well-known dipper data and fit a model with constant
+ survival and time-varying capture probability.
+ I do that with the crm (
+\series bold
+c
+\series default
+apture-
+\series bold
+r
+\series default
+ecapture 
+\series bold
+m
+\series default
+odel) function in marked which creates the admbcjs.dat file and uses R2admb
+ to run the model and read the results file.
+ The following code and results show the fitted model with marked and with
+ MARK (
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "White1999"
+
+\end_inset
+
+)using the RMark interface (
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "Laake2008"
+
+\end_inset
+
+).
+ The function prepare_admb() is a function in my personal library that does
+ the equivalent to setup_admb() in R2admb and a little more.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+prepare_admb()
+\end_layout
+
+\begin_layout Plain Layout
+
+if(length(grep("RMark",.packages()))!=0)detach("package:RMark")
+\end_layout
+
+\begin_layout Plain Layout
+
+library(marked)
+\end_layout
+
+\begin_layout Plain Layout
+
+# get dipper data
+\end_layout
+
+\begin_layout Plain Layout
+
+data(dipper)
+\end_layout
+
+\begin_layout Plain Layout
+
+# process data frame but don't accumulate same capture histories
+\end_layout
+
+\begin_layout Plain Layout
+
+dipper.proc=process.data(dipper,model="cjs",begin.time=1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# create design data
+\end_layout
+
+\begin_layout Plain Layout
+
+dipper.ddl=make.design.data(dipper.proc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+admb.mod=crm(dipper.proc,dipper.ddl,use.admb=TRUE,hessian=TRUE,
+\end_layout
+
+\begin_layout Plain Layout
+
+		      model.parameters=list(Phi=list(formula=~1),
+\end_layout
+
+\begin_layout Plain Layout
+
+                                    p=list(formula=~time)))
+\end_layout
+
+\begin_layout Plain Layout
+
+# Show results
+\end_layout
+
+\begin_layout Plain Layout
+
+admb.mod
+\end_layout
+
+\begin_layout Plain Layout
+
+# Now fit the same model with MARK via RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+# detach marked and attach RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+detach("package:marked")
+\end_layout
+
+\begin_layout Plain Layout
+
+library(RMark)
+\end_layout
+
+\begin_layout Plain Layout
+
+# process same dataframe for RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+dipper.proc=process.data(dipper,model="CJS",begin.time=1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# make design data (different format from marked)
+\end_layout
+
+\begin_layout Plain Layout
+
+dipper.ddl=make.design.data(dipper.proc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+mark.mod=mark(dipper.proc,dipper.ddl,output=FALSE,
+\end_layout
+
+\begin_layout Plain Layout
+
+		model.parameters=list(Phi=list(formula=~1),
+\end_layout
+
+\begin_layout Plain Layout
+
+                              p=list(formula=~time)))
+\end_layout
+
+\begin_layout Plain Layout
+
+# Show results
+\end_layout
+
+\begin_layout Plain Layout
+
+summary(mark.mod,brief=T)	
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size normal
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "markedWriteUpBib"
+
+\end_inset
+
+
+\size default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{landscape}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+lstset{% general command to set parameter(s)
+\end_layout
+
+\begin_layout Plain Layout
+
+basicstyle=
+\backslash
+tiny, % print whole listing small
+\end_layout
+
+\begin_layout Plain Layout
+
+keywordstyle=
+\backslash
+color{black}
+\backslash
+bfseries
+\backslash
+underbar,
+\end_layout
+
+\begin_layout Plain Layout
+
+% underlined bold black keywords
+\end_layout
+
+\begin_layout Plain Layout
+
+identifierstyle=, % nothing happens
+\end_layout
+
+\begin_layout Plain Layout
+
+commentstyle=
+\backslash
+color{white}, % white comments
+\end_layout
+
+\begin_layout Plain Layout
+
+stringstyle=
+\backslash
+ttfamily, % typewriter type for strings
+\end_layout
+
+\begin_layout Plain Layout
+
+showstringspaces=false}
+\end_layout
+
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+// Cormack-Jolly-Seber model; fixed effects only for survival (Phi) and
+ capture probability (p)
+\end_layout
+
+\begin_layout Plain Layout
+
+// Capture history can represent more than one animal; frq is the frequency
+ for the capture history
+\end_layout
+
+\begin_layout Plain Layout
+
+// Jeff Laake; 15 Nov 2012
+\end_layout
+
+\begin_layout Plain Layout
+
+DATA_SECTION 
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int n;                        // number of capture histories
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int m;                        // number of occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_imatrix ch(1,n,1,m);          // capture history matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_ivector frst(1,n);            // occasion first seen for each history
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_ivector lst(1,n);             // occasion last seen for each history
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_vector frq(1,n);              // frequency of each history
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_ivector loc(1,n);             // 0 or 1, 1 if lost on capture at
+ last event
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix tint(1,n,1,m-1);       // time interval between occasions
+ for each history-interval
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int kphi;                     // number of columns in the design
+ matrix for Phi - survival
+\end_layout
+
+\begin_layout Plain Layout
+
+    int nrows;                         // number of entries in design matrix
+ m-1 values for each of n histories
+\end_layout
+
+\begin_layout Plain Layout
+
+    !! nrows=n*(m-1);
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix phidm(1,nrows,1,kphi); // design matrix for Phi
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int kp;                       // number of columns in the design
+ matrix for p - capture probability
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix pdm(1,nrows,1,kp);     // design matrix for p
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int K;                        // number of fixed Phi values 
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix PhiF(1,K,1,2);         // Phi fixed matrix with index in
+ first column and value in second column
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int L;                        // number of fixed p values
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix pF(1,L,1,2);           // p fixed matrix with index in first
+ column and value in second column       
+\end_layout
+
+\begin_layout Plain Layout
+
+PARAMETER_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_vector phibeta(1,kphi);       // parameter vector for Phi
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_vector pbeta(1,kp);           // parameter vector for p
+\end_layout
+
+\begin_layout Plain Layout
+
+    vector phi(1,m);                   // temp vector for Phis for each
+ occasion for a single history
+\end_layout
+
+\begin_layout Plain Layout
+
+    vector p(1,m-1);                   // temp vector for Phis for each
+ occasion for a single history
+\end_layout
+
+\begin_layout Plain Layout
+
+    number pch;                        // probability of capture history
+\end_layout
+
+\begin_layout Plain Layout
+
+    vector phicumprod(1,m);            // cummulative survival probability
+ across occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+    vector cump(1,m);                  // cummulative probability of being
+ seen across occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+    vector phix(1,nrows);              // vector of all real survival values
+\end_layout
+
+\begin_layout Plain Layout
+
+    vector px(1,nrows);                // vector of all real capture probability
+ values    
+\end_layout
+
+\begin_layout Plain Layout
+
+    objective_function_value f;        // objective function - negative
+ log-likelihood 
+\end_layout
+
+\begin_layout Plain Layout
+
+PROCEDURE_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+
+    int i,i1,i2,j;                                         // miscellaneous
+ ints 
+\end_layout
+
+\begin_layout Plain Layout
+
+    f=0.0;                                                 // initialize
+ to 0     
+\end_layout
+
+\begin_layout Plain Layout
+
+    phix=1/(1+exp(-phidm*phibeta));                        // compute all
+ phi values using inverse logit
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(i=1;i<=K;i++)                                      // assign any
+ fixed real phi values
+\end_layout
+
+\begin_layout Plain Layout
+
+       phix(PhiF(i,1))=PhiF(i,2);
+\end_layout
+
+\begin_layout Plain Layout
+
+    px=1/(1+exp(-pdm*pbeta));                              // compute all
+ p values using inverse logit
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(i=1;i<=L;i++)                                      // assign any
+ fixed real p values 
+\end_layout
+
+\begin_layout Plain Layout
+
+       px(pF(i,1))=pF(i,2); 
+\end_layout
+
+\begin_layout Plain Layout
+
+    phi=0;                                                 // set all phi
+ values to 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(i=1;i<=n;i++)                                      // loop over
+ each history
+\end_layout
+
+\begin_layout Plain Layout
+
+    {
+\end_layout
+
+\begin_layout Plain Layout
+
+        phicumprod=1.0;                                    // set cummulative
+ survival to 1
+\end_layout
+
+\begin_layout Plain Layout
+
+        cump=1.0;                                          // set cummulative
+ capture prob to 1
+\end_layout
+
+\begin_layout Plain Layout
+
+        i1=(m-1)*(i-1);                                    // compute beginning
+ index in design matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+        for(j=frst(i)+1;j<=m;j++)                          // loop over
+ occasions from frst to m
+\end_layout
+
+\begin_layout Plain Layout
+
+        {
+\end_layout
+
+\begin_layout Plain Layout
+
+           i2=i1+j;                                        // compute index
+ in design matrix for this occasion
+\end_layout
+
+\begin_layout Plain Layout
+
+           phi(j-1)=pow(phix(i2-1),tint(i,j-1));           // get phi for
+ the interval adjusted for time length
+\end_layout
+
+\begin_layout Plain Layout
+
+           p(j-1)=px(i2-1);                                // get p for
+ the occasion
+\end_layout
+
+\begin_layout Plain Layout
+
+           phicumprod(j)=phicumprod(j-1)*phi(j-1);         // compute cummulativ
+e survival
+\end_layout
+
+\begin_layout Plain Layout
+
+           cump(j)=cump(j-1)*((1-p(j-1))*
+\end_layout
+
+\begin_layout Plain Layout
+
+                  (1-ch(i,j))+p(j-1)*ch(i,j));             // compute cummulativ
+e capture probability
+\end_layout
+
+\begin_layout Plain Layout
+
+        }   
+\end_layout
+
+\begin_layout Plain Layout
+
+        pch=0.0;                                           // initialize
+ capture history probability 
+\end_layout
+
+\begin_layout Plain Layout
+
+        for(j=lst(i);j<=((1-loc(i))*m+loc(i)*lst(i));j++)  // loop over
+ last occasion to m unless loss on capture
+\end_layout
+
+\begin_layout Plain Layout
+
+        {                                                  //  to compute
+ prob of the capture history 
+\end_layout
+
+\begin_layout Plain Layout
+
+           i2=i1+j;                                        // index occasion
+\end_layout
+
+\begin_layout Plain Layout
+
+           pch=pch+cump(j)*phicumprod(j)*(1-phi(j));       // probability
+ of history given possible last occasion alive
+\end_layout
+
+\begin_layout Plain Layout
+
+        }   
+\end_layout
+
+\begin_layout Plain Layout
+
+        if(pch < 1E-15 & frq(i)> 0) pch=1E-307;            // avoid log(0)
+\end_layout
+
+\begin_layout Plain Layout
+
+        f-=frq(i)*log(pch);                                // sum -log-likelihoo
+d frequency*log(pr(ch))
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{landscape}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document
