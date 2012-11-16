@@ -241,21 +241,12 @@ he probability death occurs after occasion d is represented as
 .
  The possible times of death are those after the last occasion the animal
  was seen until the last possible occasion 
-\begin_inset Formula $k_{i}$
-\end_inset
-
- which is 
-\begin_inset Formula $l_{i}$
-\end_inset
-
- if the animal was not released after the last occasion seen (loss on capture)
- or 
 \shape italic
 m
 \shape default
-, meaning the animal survived through the entire sampling period.
+.
  The probability of the capture history 
-\begin_inset Formula $Pr(\omega_{i})=Pr(\omega_{i}|\, f_{i})=\sum_{d=l_{i}}^{k_{i}}Pr(\omega_{i}|\, f_{i},\, d)Pr(d\,|\, f_{i})$
+\begin_inset Formula $Pr(\omega_{i})=Pr(\omega_{i}|\, f_{i})=\sum_{d=l_{i}}^{m}Pr(\omega_{i}|\, f_{i},\, d)Pr(d\,|\, f_{i})$
 \end_inset
 
  implicitly depends on the first release occasion but it is dropped from
@@ -293,6 +284,29 @@ j+1
 \begin_inset Formula 
 \[
 Pr(\omega_{i})=\sum_{d=l_{i}}^{k_{i}}\;\prod_{j=f_{i}+1}^{d}p_{ij}^{\omega_{ij}}(1-p_{ij})^{(1-\omega_{ij})}\left(\prod_{j=f}^{d-1}\phi_{ij}\right)(1-\phi_{id})
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\phi_{im}=0$
+\end_inset
+
+.
+ For animals that are not released on the last occasion they were seen (loss
+ on capture) typically because they die due to handling, the probability
+ of the capture history is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+Pr(\omega_{i})=\prod_{j=f_{i}+1}^{l_{i}}p_{ij}^{\omega_{ij}}(1-p_{ij})^{(1-\omega_{ij})}\left(\prod_{j=f}^{l_{i}-1}\phi_{ij}\right)
 \]
 
 \end_inset
@@ -1252,12 +1266,28 @@ e capture probability
 
 \begin_layout Plain Layout
 
-           i2=i1+j;                                        // index occasion
+           i2=i1+j;  		                               // index occasion
 \end_layout
 
 \begin_layout Plain Layout
 
-           pch=pch+cump(j)*phicumprod(j)*(1-phi(j));       // probability
+		   if(loc(i)==1)
+\end_layout
+
+\begin_layout Plain Layout
+
+              pch=pch+cump(j)*phicumprod(j);               // probability
+ of history for loss on captures
+\end_layout
+
+\begin_layout Plain Layout
+
+		   else
+\end_layout
+
+\begin_layout Plain Layout
+
+              pch=pch+cump(j)*phicumprod(j)*(1-phi(j));    // probability
  of history given possible last occasion alive
 \end_layout
 
