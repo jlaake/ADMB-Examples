@@ -1266,12 +1266,12 @@ e capture probability
 
 \begin_layout Plain Layout
 
-           i2=i1+j;  		                               // index occasion
+           i2=i1+j;                                        // index occasion
 \end_layout
 
 \begin_layout Plain Layout
 
-		   if(loc(i)==1)
+           if(loc(i)==1)
 \end_layout
 
 \begin_layout Plain Layout
@@ -1282,7 +1282,7 @@ e capture probability
 
 \begin_layout Plain Layout
 
-		   else
+           else
 \end_layout
 
 \begin_layout Plain Layout
