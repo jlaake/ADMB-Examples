@@ -1710,6 +1710,11 @@ fx.eps=function(eps,x,par,w)
 
 \end_inset
 
+
+\end_layout
+
+\begin_layout Standard
+\noindent
 The following fits the simulated data with both likelihoods to demonstrate
  the differences in the fitted detection function curves to the data:
 \end_layout
