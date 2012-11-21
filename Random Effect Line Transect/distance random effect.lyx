@@ -1,0 +1,1989 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+\usepackage{amsthm}\usepackage{epsfig}\usepackage{psfrag}\usepackage{lineno}
+
+\bibliographystyle{apalike}
+
+%\setlength{\evensidemargin}{0in} \setlength{\oddsidemargin}{0in}
+%\setlength{\topmargin}{0.0in} \setlength{\textwidth}{6.5in}
+%\setlength{\textheight}{9in} \setlength{\topskip}{0in}
+%\setlength{\headheight}{0in} \setlength{\headsep}{0in}
+\end_preamble
+\use_default_options false
+\begin_modules
+sweave
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 1
+\use_mhchem 0
+\use_mathdots 0
+\cite_engine natbib_authoryear
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Line Transect Sampling with Random Scale Detection Function
+\end_layout
+
+\begin_layout Author
+Jeff Laake
+\end_layout
+
+\begin_layout Standard
+Currently there are 3 primary ways to fit detection functions for distance
+ sampling data.
+ The most common is the key function and adjustment series described in
+ Buckland et al (2001).
+ The general formula is 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(x)=\frac{k(x)(1+\sum_{j=1}^{m}a_{j}p_{j}(x))}{k(0)(1+\sum_{j=1}^{m}a_{j}(0))}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $k(x)$
+\end_inset
+
+ is a key function and
+\begin_inset Formula $a_{j}(x)$
+\end_inset
+
+ is a series of adjustment functions.
+ The demoninator scales the function such that g(0)=1 although it is not
+ necessary for fitting.
+ An example is a half-normal key function and a cosine adjustment series
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(x)=\frac{\exp(-(x/\gamma)^{2}/2)(1+\sum_{j=1}^{m}a_{j}\cos(j\tau x/w))}{(1+\sum_{j=1}^{m}a_{j})}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The key-adjustment approach is quite flexible but requires a selected truncation
+ width (
+\shape italic
+w
+\shape default
+), requires non-linear constraints to maintain monotonicty and ensure 
+\begin_inset Formula $1>g(x)>0$
+\end_inset
+
+, and fitting of detection functions with long tails is problematic.
+ 
+\end_layout
+
+\begin_layout Standard
+A second approach is to include explanatory covariates (
+\shape italic
+z
+\shape default
+) in the detection function (Marques and Buckland 2003).
+ An example using a half-normal detection function is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(\mathbf{x}|\mathbf{z})=\exp(-[\mathbf{x}/\exp(\boldsymbol{X_{z}\mathbf{\boldsymbol{\beta}}})]^{2}/2)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\series bold
+\shape italic
+x
+\series default
+\shape default
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+is the vector of distance, 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+z
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ is a data vector or matrix, 
+\begin_inset Formula $X_{z}$
+\end_inset
+
+ is a design matrix for the covariates and 
+\begin_inset Formula $\boldsymbol{\beta}$
+\end_inset
+
+ is a parameter vector.
+ The analysis is conditional on 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+z
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+, so it is essential that the unspecified distribution for 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+z
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ is independent of 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+x
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+.
+ An obvious example that fails would be to use animal behavior that might
+ differ with 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+x
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ (
+\family default
+\series default
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+e.g
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+.
+ movement).
+ This approach provides monotone detection functions without constraints,
+ does not require truncation and can fit long tails.
+ It has the added advantage of providing better small-area estimates of
+ density when the covariates vary spatially.
+ The covariate approach does depend on being able to identify and measure
+ covariates that affect detection probability.
+ If there is any remaining lack of fit, the first and second approaches
+ can be combined using covariates in the key function and a series adjustment;
+ however, it is then fraught with the same problems and the constraints
+ can become even more problematic because they depend on the explanatory
+ covariate values.
+ Even if the problem is constrained correctly for all observed values of
+ 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+z
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+, predictions for unobserved values of 
+\family default
+\series bold
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+z
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ may yield invalid probabilities with the addition of adjustment functions.
+\end_layout
+
+\begin_layout Standard
+The third approach is rather recent and involves fitting a mixture of detection
+ functions (Miller and Thomas in prep) along the lines of Pledger (2000)
+ for capture-recapture models.
+ The detection function can be represented as:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(x)=\sum_{j=1}^{m}\pi_{j}g_{j}'(x)
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\sum_{j=1}^{m}\pi_{j}=1$
+\end_inset
+
+ and 
+\begin_inset Formula $g_{j}'(x)$
+\end_inset
+
+ is a properly specified detection function.
+ As long as each component detection function is monotone, 
+\begin_inset Formula $g(x)$
+\end_inset
+
+ will be monotone.
+\end_layout
+
+\begin_layout Standard
+An additional approach I present here is to use random effects in the detection
+ function scale, essentially a random scale detection function that allows
+ for unmodelled heterogeneity in detection.
+ For example, consider a half-normal detection function with an intercept
+ and a normal error with mean 0:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+g(x|\epsilon)=\exp(-x^{2}/(2\gamma(\epsilon)^{2}))
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\gamma(\epsilon)=\exp(\beta+\epsilon)\quad.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+If you consider that long-tails may result from some objects or some conditions
+ under which the object is detectability even at long distances, then it
+ is clear that the random scale will be able to deal with long-tailed detection
+ functions.
+ In composing the likelihood for the random scale model my initial approach
+ was as follows:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\prod_{i=1}^{n}\intop_{-\infty}^{\infty}f(x_{i}|\epsilon)\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x|\epsilon)=\frac{g(x|\epsilon)}{\intop_{0}^{w}g(u|\epsilon)du}\quad,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+\begin_inset Formula $N(\epsilon,0,\sigma_{\epsilon})$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ is the normal density function evaluated at 
+\begin_inset Formula $\epsilon$
+\end_inset
+
+ with mean 0 and standard deviation 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\sigma_{\epsilon}$
+\end_inset
+
+and
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ 
+\shape italic
+w
+\shape default
+ is the transect half-width which can be infinte.
+ However, that will produce biased estimates and a lack of fit which both
+ increase as 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\sigma_{\epsilon}$
+\end_inset
+
+ increases.
+ It is the correct likelihood if 
+\begin_inset Formula $\sigma_{\epsilon}=0$
+\end_inset
+
+ (Buckland et al 2001) because the integrals are degenerate; however it
+ is not properly conditioned if 
+\begin_inset Formula $\sigma_{\epsilon}>0$
+\end_inset
+
+ .
+ The probability density function 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ for observed distances is the probability an observation was made at distance
+ 
+\family default
+\series default
+\shape italic
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+x 
+\shape default
+given it was seen.
+ The probability it was seen at x is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\intop_{-\infty}^{\infty}g(x|\epsilon)N(\epsilon,0,\sigma_{\epsilon})d\epsilon\quad,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and the probability it was seen at all is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon\quad,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+so the proper likelihood is 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+\prod_{i=1}^{n}\frac{\intop_{-\infty}^{\infty}g(x_{i}|\epsilon)\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}{\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+If 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\sigma_{\epsilon}=0$
+\end_inset
+
+, the likelihood is the same as given by Buckland et al.
+ (2001).
+ A mixed-effects model in which explanatory covariates are included, as
+ in approach 2, can be accomplished easily by using:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+\gamma(\epsilon)=\exp(\boldsymbol{X_{z}}\boldsymbol{\beta}+\epsilon)\quad.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following code will simulate data with a random scale for a half-normal
+ detection function gx.
+ As explained in the comments, the estimated 
+\begin_inset Formula $\beta$
+\end_inset
+
+ will not match the value of the supplied argument beta, unless rejection
+ sampling is used.
+ I found this very confusing at first but if you consider how the data are
+ simulated it will become clear that rejection sampling mimics the correct
+ likelihood and generating distances with rnorm directly mimics the incorrect
+ likelihood.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<echo=FALSE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+set.seed(123)
+\end_layout
+
+\begin_layout Plain Layout
+
+library(mrds)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+# Half-normal detection function
+\end_layout
+
+\begin_layout Plain Layout
+
+gx=function(x,sigma)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  exp(-.5*(x/sigma)^2)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+simdata=function(n=500,beta=2,beta_eps=-1,w=Inf,
+\end_layout
+
+\begin_layout Plain Layout
+
+                         reject=TRUE,b=10000)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+# n        - sample size
+\end_layout
+
+\begin_layout Plain Layout
+
+# beta     - scale intercept
+\end_layout
+
+\begin_layout Plain Layout
+
+# beta_eps - beta for random effect sigma
+\end_layout
+
+\begin_layout Plain Layout
+
+# w        - width of transect
+\end_layout
+
+\begin_layout Plain Layout
+
+# reject   - if TRUE uses brute force rejection sampling to 
+\end_layout
+
+\begin_layout Plain Layout
+
+#            generate distances;if w=Inf, it uses a large w 
+\end_layout
+
+\begin_layout Plain Layout
+
+#            to avoid any appreciable truncation
+\end_layout
+
+\begin_layout Plain Layout
+
+# b        - number of deviates generated in a batch for 
+\end_layout
+
+\begin_layout Plain Layout
+
+#             rejection sampling
+\end_layout
+
+\begin_layout Plain Layout
+
+#         
+\end_layout
+
+\begin_layout Plain Layout
+
+# If reject==FALSE, it generates distances directly with 
+\end_layout
+
+\begin_layout Plain Layout
+
+# rnorm but if this approach is used, the estimated beta with 
+\end_layout
+
+\begin_layout Plain Layout
+
+# the correct likelihood will not match the generating beta but 
+\end_layout
+
+\begin_layout Plain Layout
+
+# this is not bias in the usual sense.
+ It will match the beta
+\end_layout
+
+\begin_layout Plain Layout
+
+# from the incorrect likelihood.
+\end_layout
+
+\begin_layout Plain Layout
+
+	if(reject)
+\end_layout
+
+\begin_layout Plain Layout
+
+	{
+\end_layout
+
+\begin_layout Plain Layout
+
+		if(w==Inf)
+\end_layout
+
+\begin_layout Plain Layout
+
+			w=3*exp(beta+3*exp(beta_eps))
+\end_layout
+
+\begin_layout Plain Layout
+
+		x=NULL
+\end_layout
+
+\begin_layout Plain Layout
+
+        while(length(x)<n)
+\end_layout
+
+\begin_layout Plain Layout
+
+		{
+\end_layout
+
+\begin_layout Plain Layout
+
+			u=runif(b,0,w)
+\end_layout
+
+\begin_layout Plain Layout
+
+			sigma=exp(beta+rnorm(b,0,1)*exp(beta_eps))
+\end_layout
+
+\begin_layout Plain Layout
+
+			seen=gx(u,sigma)>runif(b,0,1)
+\end_layout
+
+\begin_layout Plain Layout
+
+			x=c(x,u[seen])
+\end_layout
+
+\begin_layout Plain Layout
+
+		}
+\end_layout
+
+\begin_layout Plain Layout
+
+		return(x[1:n])
+\end_layout
+
+\begin_layout Plain Layout
+
+	}else
+\end_layout
+
+\begin_layout Plain Layout
+
+	{
+\end_layout
+
+\begin_layout Plain Layout
+
+		sigma=exp(beta+rnorm(n,0,1)*exp(beta_eps))
+\end_layout
+
+\begin_layout Plain Layout
+
+		x=abs(rnorm(n,0,sigma))
+\end_layout
+
+\begin_layout Plain Layout
+
+		return(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+	}
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+x=simdata(n=500,w=Inf,beta_eps=-.5) 
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following is the code needed to fit and plot the model.
+ The plotfit function uses histline from the mrds package which is on CRAN.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+# Half-normal * density(eps)
+\end_layout
+
+\begin_layout Plain Layout
+
+gx.eps=function(x,eps,par)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+    sigma=exp(par[1]+eps*exp(par[2]))
+\end_layout
+
+\begin_layout Plain Layout
+
+    gx(x,sigma)*dnorm(eps,0,1)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+# Average half-normal integrated over distribution of eps
+\end_layout
+
+\begin_layout Plain Layout
+
+avg_gx=function(x,par,weps=5)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+    gx=vector("numeric",length=length(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+    geps.x=function(eps,x,par)gx.eps(x,eps,par)
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(i in 1:length(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+     gx[i]=integrate(geps.x,-weps,weps,x=x[i],par=par)$value
+\end_layout
+
+\begin_layout Plain Layout
+
+    gx
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+# Average detection probability * density eps
+\end_layout
+
+\begin_layout Plain Layout
+
+mu=function(eps,w,par)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  mu=vector("numeric",length=length(eps))
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(i in 1:length(eps))
+\end_layout
+
+\begin_layout Plain Layout
+
+  {
+\end_layout
+
+\begin_layout Plain Layout
+
+    sigma=exp(par[1]+eps[i]*exp(par[2]))
+\end_layout
+
+\begin_layout Plain Layout
+
+    mu[i]=sigma*sqrt(2*pi)*(pnorm(w,0,sigma)-.5)*dnorm(eps[i],0,1)
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  mu
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+# Average detection probability - integrated over eps
+\end_layout
+
+\begin_layout Plain Layout
+
+avg_mu=function(w,par,weps=5)
+\end_layout
+
+\begin_layout Plain Layout
+
+	integrate(mu,-weps,weps,w=w,par=par)$value
+\end_layout
+
+\begin_layout Plain Layout
+
+# Negative log-likelihood function 
+\end_layout
+
+\begin_layout Plain Layout
+
+flnl=function(par,x,w,weps=5,wrong=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+  lnl=0
+\end_layout
+
+\begin_layout Plain Layout
+
+  for(i in 1:length(x))
+\end_layout
+
+\begin_layout Plain Layout
+
+  {
+\end_layout
+
+\begin_layout Plain Layout
+
+     if(length(par)>1)
+\end_layout
+
+\begin_layout Plain Layout
+
+         if(wrong)
+\end_layout
+
+\begin_layout Plain Layout
+
+            lnl=lnl-log(integrate(fx.eps,-weps,weps,
+\end_layout
+
+\begin_layout Plain Layout
+
+                          x=x[i],w=w,par=par)$value)
+\end_layout
+
+\begin_layout Plain Layout
+
+         else
+\end_layout
+
+\begin_layout Plain Layout
+
+            lnl=lnl-log(avg_gx(x[i],par)/
+\end_layout
+
+\begin_layout Plain Layout
+
+                      avg_mu(w,par,weps))
+\end_layout
+
+\begin_layout Plain Layout
+
+	 else
+\end_layout
+
+\begin_layout Plain Layout
+
+	 {
+\end_layout
+
+\begin_layout Plain Layout
+
+		 sigma=exp(par[1])
+\end_layout
+
+\begin_layout Plain Layout
+
+		 mu=sigma*sqrt(2*pi)*(pnorm(w,0,sigma)-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+		 lnl=lnl-log(gx(x[i],sigma=sigma))+log(mu)
+\end_layout
+
+\begin_layout Plain Layout
+
+	 }
+\end_layout
+
+\begin_layout Plain Layout
+
+  }
+\end_layout
+
+\begin_layout Plain Layout
+
+  lnl
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+fitdata=function(x,beta=2,beta_eps=-1,w=Inf,
+\end_layout
+
+\begin_layout Plain Layout
+
+		         weps=5,lower=beta/2,upper=2*beta,
+\end_layout
+
+\begin_layout Plain Layout
+
+				 wrong=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+n=length(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+if(is.null(beta_eps))
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	# fit fixed scale model
+\end_layout
+
+\begin_layout Plain Layout
+
+	model=optimize(flnl,lower=lower,upper=upper,
+\end_layout
+
+\begin_layout Plain Layout
+
+                          x=x,w=w,weps=weps)
+\end_layout
+
+\begin_layout Plain Layout
+
+	model$par=model$minimum
+\end_layout
+
+\begin_layout Plain Layout
+
+}else
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+#   fit random scale model 
+\end_layout
+
+\begin_layout Plain Layout
+
+	model=optim(par=c(beta,beta_eps),
+\end_layout
+
+\begin_layout Plain Layout
+
+       flnl,x=x,w=w,weps=weps,wrong=wrong)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+model$x=x
+\end_layout
+
+\begin_layout Plain Layout
+
+model$w=w
+\end_layout
+
+\begin_layout Plain Layout
+
+return(list(model=model))
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit=function(result,nclass=NULL,weps=5,main=NULL)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+# Create plot of fit; uses histline from mrds
+\end_layout
+
+\begin_layout Plain Layout
+
+par=result$model$par
+\end_layout
+
+\begin_layout Plain Layout
+
+if(length(par)<2)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	# compute fixed mu
+\end_layout
+
+\begin_layout Plain Layout
+
+	avg_mu_est=exp(par)*sqrt(2*pi)*
+\end_layout
+
+\begin_layout Plain Layout
+
+            (pnorm(result$model$w,0,exp(par))-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+}else
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	# Compute average_mu
+\end_layout
+
+\begin_layout Plain Layout
+
+	avg_mu_est=avg_mu(w=result$model$w,par=par,weps=weps)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+# Compute Nhat if W<Inf
+\end_layout
+
+\begin_layout Plain Layout
+
+if(result$model$w!=Inf)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	Nhat=length(x)/(avg_mu_est/result$model$w)
+\end_layout
+
+\begin_layout Plain Layout
+
+}else
+\end_layout
+
+\begin_layout Plain Layout
+
+	Nhat=NULL
+\end_layout
+
+\begin_layout Plain Layout
+
+result$Nhat=Nhat
+\end_layout
+
+\begin_layout Plain Layout
+
+x=result$model$x
+\end_layout
+
+\begin_layout Plain Layout
+
+max_x=max(x)
+\end_layout
+
+\begin_layout Plain Layout
+
+if(is.null(nclass))
+\end_layout
+
+\begin_layout Plain Layout
+
+	nints=ceiling(sqrt(length(x)))
+\end_layout
+
+\begin_layout Plain Layout
+
+else
+\end_layout
+
+\begin_layout Plain Layout
+
+	nints=nclass
+\end_layout
+
+\begin_layout Plain Layout
+
+int_width=max_x/nints
+\end_layout
+
+\begin_layout Plain Layout
+
+breaks=int_width*(0:nints)
+\end_layout
+
+\begin_layout Plain Layout
+
+ints=(0:100)*max_x/100
+\end_layout
+
+\begin_layout Plain Layout
+
+hh=hist(x,plot=F,breaks=breaks)
+\end_layout
+
+\begin_layout Plain Layout
+
+bars=(hh$counts/(sum(hh$counts)*int_width))*avg_mu_est
+\end_layout
+
+\begin_layout Plain Layout
+
+if(length(par)<2)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+   gx=gx(ints,sigma=exp(par))
+\end_layout
+
+\begin_layout Plain Layout
+
+}else
+\end_layout
+
+\begin_layout Plain Layout
+
+   gx=avg_gx(ints,par=par)
+\end_layout
+
+\begin_layout Plain Layout
+
+mrds:::histline(bars,breaks,ylim=c(0,max(c(1,bars))),
+\end_layout
+
+\begin_layout Plain Layout
+
+      xlab="Distance",ylab="Detection probability",main=main)
+\end_layout
+
+\begin_layout Plain Layout
+
+lines(ints,gx)
+\end_layout
+
+\begin_layout Plain Layout
+
+return(result)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+Notice that the fitting function fitdata has an argument wrong that is passed
+ to the function flnl which computes the negative log-likelihood.
+ If wrong is TRUE then it uses the incorrect likelihood to demonstrate the
+ fitted model with the incorrect likelihood.
+ The incorrect likelihood uses the following functions:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+# pdf - for incorrect likelihood 
+\end_layout
+
+\begin_layout Plain Layout
+
+fx=function(x,sigma,w)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	mu=sigma*sqrt(2*pi)*(pnorm(w,0,sigma)-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+	exp(-.5*(x/sigma)^2)/mu
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+# pdf * density(eps) - for incorrect likelihood 
+\end_layout
+
+\begin_layout Plain Layout
+
+fx.eps=function(eps,x,par,w)
+\end_layout
+
+\begin_layout Plain Layout
+
+{
+\end_layout
+
+\begin_layout Plain Layout
+
+	sigma=exp(par[1]+eps*exp(par[2]))
+\end_layout
+
+\begin_layout Plain Layout
+
+	fx(x,sigma,w)*dnorm(eps,0,1)
+\end_layout
+
+\begin_layout Plain Layout
+
+}
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+The following fits the simulated data with both likelihoods to demonstrate
+ the differences in the fitted detection function curves to the data:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<fig=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+par(mfrow=c(1,2)) 
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random=fitdata(x,w=Inf,beta_eps=-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random=plotfit(results_random,nclass=30)
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random_wrong=plotfit(results_random_wrong,nclass=30)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The estimated parameters with the correct likelihood are 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random$model$par[1],3)}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random$model$par[2],3)}
+\end_layout
+
+\end_inset
+
+ which are quite close to the true values (beta=2,beta_eps=-0.5) used to
+ simulate the data.
+ The estimated parameters with the incorrect likelihood are 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random_wrong$model$par[1],3)}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random_wrong$model$par[2],3)}
+\end_layout
+
+\end_inset
+
+.
+ The incorrect likelihood provides the same estimate of 
+\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
+\end_inset
+
+ but an estimate of 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+ that is too large as reflected in the lack of fit.
+ 
+\end_layout
+
+\begin_layout Standard
+The following demonstrates what happens when rejection sampling is not used.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<fig=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+x=simdata(n=500,w=Inf,beta_eps=-.5,reject=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+par(mfrow=c(1,2)) 
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random=fitdata(x,w=Inf,beta_eps=-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random=plotfit(results_random,nclass=30)
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random_wrong=plotfit(results_random_wrong,nclass=30)
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The lack of fit remains for the incorrect likelihood but now the estimated
+ parameters with the correct likelihood are 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random$model$par[1],3)}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random$model$par[2],3)}
+\end_layout
+
+\end_inset
+
+ and the estimated parameters with the incorrect likelihood are 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random_wrong$model$par[1],3)}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
+\end_inset
+
+=
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(results_random_wrong$model$par[2],3)}
+\end_layout
+
+\end_inset
+
+.
+ Now the incorrect likelihood provides a 
+\begin_inset Formula $\hat{\beta}$
+\end_inset
+
+ that is close to the generating value but the value for the correct likelihood
+ is too small but is the best estimate for the data.
+ 
+\end_layout
+
+\end_body
+\end_document
