@@ -1,4 +1,5 @@
 # Number of histories
+set.seed(123)
 n=500
 # Number of occasions
 nocc=10

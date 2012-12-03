@@ -75,11 +75,270 @@ sweave
 \begin_body
 
 \begin_layout Title
-Line Transect Sampling with Random Scale Detection Function
+Distance Sampling with Random Scale Detection Function
 \end_layout
 
 \begin_layout Author
-Jeff Laake
+Jeff Laake and Hans Skaug
+\end_layout
+
+\begin_layout Section
+Introduction
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<echo=FALSE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+library(RandomScale)
+\end_layout
+
+\begin_layout Plain Layout
+
+prepare_admb()
+\end_layout
+
+\begin_layout Plain Layout
+
+set.seed(123)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Distance sampling was developed to estimate abundance from observational
+ surveys with visibility bias (Buckland et al.
+ 2001).
+ A probability density function is fitted to the sample of observed distances
+ to infer the detection probabilty for the sample.
+ For line transect sampling, distance is the perpendicular distance from
+ the line to the object and for points, the radial distance is from the
+ point to the object.
+ The detection function 
+\begin_inset Formula $g(x)$
+\end_inset
+
+ is the probability of seeing an object at distance 
+\shape italic
+x
+\shape default
+ given the object is at that distance and 
+\begin_inset Formula $h(x)$
+\end_inset
+
+ is the probability that the object is at distance 
+\shape italic
+x.
+ 
+\shape default
+The probability density function 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ for the sample of observed distances is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+f(x)=\frac{g(x)h(x)}{\int g(u)h(u)du}\quad,
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+which is the conditional probability the object was seen at 
+\shape italic
+x
+\shape default
+ given it was seen somewhere.
+ From the assumption of random line or point placement, we assume uniform
+ density locally with respect to 
+\shape italic
+x
+\shape default
+ over a sample of lines or points.
+ For lines, this means that 
+\begin_inset Formula $h(x)=1/w$
+\end_inset
+
+ where 
+\shape italic
+w
+\shape default
+ is the strip half-width 
+\shape italic
+w
+\shape default
+ and for points 
+\begin_inset Formula $h(x)=2\pi x/(\pi w^{2})$
+\end_inset
+
+ where 
+\shape italic
+w
+\shape default
+ is the radius of the circle.
+ From here on, we will refer to line transect sampling although the methods
+ we describe are the same for points with the adjustment for a different
+ 
+\begin_inset Formula $h(x)$
+\end_inset
+
+.
+ With 
+\begin_inset Formula $h(x)=1/w$
+\end_inset
+
+, 
+\begin_inset Formula $f(x)$
+\end_inset
+
+ simplifies to 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+f(x)=\frac{g(x)}{\int_{0}^{w}g(u)du}\quad.\label{eq:lt pdf}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+With the additional assumption that detection at 
+\shape italic
+x
+\shape default
+=0 is perfect (
+\begin_inset Formula $g(0)=1$
+\end_inset
+
+), then 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+f(0)=\frac{1}{\int_{0}^{w}g(u)du}\quad.\label{eq:lt pdf-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and for 
+\shape italic
+n
+\shape default
+ observations from strips of length 
+\shape italic
+L
+\shape default
+ and width 2
+\shape italic
+w
+\shape default
+, object density is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+D=\frac{n}{2wLp}=\frac{n}{2wL\int_{0}^{w}g(u)\frac{1}{w}du}=\frac{nf(0)}{2L}\quad,\label{eq:density}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $p=\int_{0}^{w}g(u)\frac{1}{w}du$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ is the average detection probability.
+ The quantity 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\mu=\int_{0}^{w}g(u)du=wp$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ is called the effective strip width (ESW), but is actually a half-strip
+ width for each side of the line.
 \end_layout
 
 \begin_layout Standard
@@ -93,7 +352,7 @@ Currently there are 3 primary ways to fit detection functions for distance
 \begin_layout Standard
 \begin_inset Formula 
 \[
-g(x)=\frac{k(x)(1+\sum_{j=1}^{m}a_{j}p_{j}(x))}{k(0)(1+\sum_{j=1}^{m}a_{j}(0))}
+g(x)=\frac{k(x)(1+\sum_{j=1}^{m}a_{j}p_{j}(x))}{k(0)(1+\sum_{j=1}^{m}a_{j}p_{j}(0))}
 \]
 
 \end_inset
@@ -119,20 +378,31 @@ where
 \begin_inset Formula $k(x)$
 \end_inset
 
- is a key function and
-\begin_inset Formula $a_{j}(x)$
+ is a key function and 
+\begin_inset Formula $p_{j}(x)$
 \end_inset
 
- is a series of adjustment functions.
+ is a series of adjustment functions with coefficients 
+\begin_inset Formula $a_{j}$
+\end_inset
+
+.
  The demoninator scales the function such that g(0)=1 although it is not
- necessary for fitting.
+ necessary for fitting because the denominator cancels in eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:lt pdf"
+
+\end_inset
+
+.
  An example is a half-normal key function and a cosine adjustment series
 \end_layout
 
 \begin_layout Standard
 \begin_inset Formula 
 \[
-g(x)=\frac{\exp(-(x/\gamma)^{2}/2)(1+\sum_{j=1}^{m}a_{j}\cos(j\tau x/w))}{(1+\sum_{j=1}^{m}a_{j})}
+g(x)=\frac{\exp(-(x/\gamma)^{2}/2)(1+\sum_{j=1}^{m}a_{j}\cos(j\pi x/w))}{(1+\sum_{j=1}^{m}a_{j})}
 \]
 
 \end_inset
@@ -463,10 +733,13 @@ where
  will be monotone.
 \end_layout
 
+\begin_layout Section
+Random Scale Detection Function
+\end_layout
+
 \begin_layout Standard
-An additional approach I present here is to use random effects in the detection
- function scale, essentially a random scale detection function that allows
- for unmodelled heterogeneity in detection.
+An additional approach we present here is to use random effects in the detection
+ function scale to allow for unmodelled heterogeneity in detection.
  For example, consider a half-normal detection function with an intercept
  and a normal error with mean 0:
 \end_layout
@@ -500,44 +773,7 @@ and
 
 \begin_layout Standard
 \noindent
-If you consider that long-tails may result from some objects or some conditions
- under which the object is detectability even at long distances, then it
- is clear that the random scale will be able to deal with long-tailed detection
- functions.
- In composing the likelihood for the random scale model my initial approach
- was as follows:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\prod_{i=1}^{n}\intop_{-\infty}^{\infty}f(x_{i}|\epsilon)\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-where
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-f(x|\epsilon)=\frac{g(x|\epsilon)}{\intop_{0}^{w}g(u|\epsilon)du}\quad,
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-
+We will assume a normal distribution for 
 \family roman
 \series medium
 \shape up
@@ -549,7 +785,8 @@ f(x|\epsilon)=\frac{g(x|\epsilon)}{\intop_{0}^{w}g(u|\epsilon)du}\quad,
 \uwave off
 \noun off
 \color none
-\begin_inset Formula $N(\epsilon,0,\sigma_{\epsilon})$
+
+\begin_inset Formula $\epsilon$
 \end_inset
 
 
@@ -564,7 +801,35 @@ f(x|\epsilon)=\frac{g(x|\epsilon)}{\intop_{0}^{w}g(u|\epsilon)du}\quad,
 \uwave default
 \noun default
 \color inherit
- is the normal density function evaluated at 
+ and use the shorthand
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\begin_inset Formula $N(\epsilon,0,\sigma_{\epsilon})=\exp\left(-0.5\left(\frac{\epsilon}{\sigma_{\epsilon}}\right)^{2}\right)\left(\sqrt{2\pi}\sigma_{\epsilon}\right)^{-1}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ for the normal density function evaluated at 
 \begin_inset Formula $\epsilon$
 \end_inset
 
@@ -584,7 +849,7 @@ f(x|\epsilon)=\frac{g(x|\epsilon)}{\intop_{0}^{w}g(u|\epsilon)du}\quad,
 \begin_inset Formula $\sigma_{\epsilon}$
 \end_inset
 
-and
+
 \family default
 \series default
 \shape default
@@ -596,13 +861,98 @@ and
 \uwave default
 \noun default
 \color inherit
+.
+ If you consider that long-tails may result from some objects or some conditions
+ under which the object is detectable even at long distances, then it is
+ clear that the random scale will be able to cope with long-tailed detection
+ functions.
  
-\shape italic
-w
-\shape default
- is the transect half-width which can be infinte.
- However, that will produce biased estimates and a lack of fit which both
- increase as 
+\end_layout
+
+\begin_layout Standard
+If you think about the random effect as an unknown covariate value, then
+ the likelihood can be derived directly from equations 2.39 and 2.40 in Borchers
+ and Burnham et al.
+ (2004) by including an integral over the unknown random effect:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\begin{equation}
+\prod_{i=1}^{n}\frac{\intop_{-\infty}^{\infty}g(x_{i}|\epsilon)\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}{\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}\label{eq:g likelihood}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The numerator is the marginal probability that the object was seen at x:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\intop_{-\infty}^{\infty}g(x|\epsilon)N(\epsilon,0,\sigma_{\epsilon})\frac{1}{w}d\epsilon\quad,
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+and the denominator is the probability that the object was seen:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})\frac{1}{w}d\epsilon\quad,\label{eq:p random}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+An alternative likelihood is:
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\begin{equation}
+\prod_{i=1}^{n}\frac{\intop_{-\infty}^{\infty}f(x_{i}|\epsilon)\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}{\intop_{-\infty}^{\infty}\int_{0}^{w}f(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}\label{eq:f likelihood}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+f(x|\epsilon)=\left(\sqrt{2\pi}\gamma(\epsilon)\right)^{-1}\exp\left(-x^{2}/(2\gamma(\epsilon)^{2})\right)
+\]
+
+\end_inset
+
+is scaled to be a probability density function.
+ These two likelihoods are equivalent except that 
 \family roman
 \series medium
 \shape up
@@ -615,1165 +965,1056 @@ w
 \noun off
 \color none
 
+\begin_inset Formula $\beta_{f}=\beta_{g}+\sigma_{\epsilon}^{2}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ where 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\beta_{f}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ and 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\beta_{g}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ are derived from eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:f likelihood"
+
+\end_inset
+
+ and eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+ respectively.
+ One might be tempted to use the following likelihood:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\prod_{i=1}^{n}\intop_{-\infty}^{\infty}\frac{g(x_{i}|\epsilon)}{\intop_{0}^{w}g(u|\epsilon)du}N(\epsilon,0,\sigma_{\epsilon})d\epsilon\label{eq:Incorrect likelihood}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+but it is not correct and will produce biased estimates.
+ If 
+\begin_inset Formula $w=\infty$
+\end_inset
+
+, then the relationship 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\beta_{f}=\beta_{g}+\sigma_{\epsilon}^{2}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ holds where
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+ 
+\begin_inset Formula $\beta_{f}$
+\end_inset
+
+ is derived from eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
+
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+ but it does not hold if the data are truncated.
+ 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+A mixed-effects model in which explanatory covariates (
+\begin_inset Formula $\boldsymbol{z}$
+\end_inset
+
+) are included in the detection function can be accomplished by using:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+\gamma(\epsilon,\boldsymbol{z})=\exp(\boldsymbol{X_{\boldsymbol{z}}}\boldsymbol{\beta}+\epsilon)\quad.
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\boldsymbol{X_{\boldsymbol{z}}}$
+\end_inset
+
+ is a design matrix for the known covariate values.
+ In this case, the likelihood is conditional on the observed covariate values.
+\end_layout
+
+\begin_layout Standard
+The estimate of density or likewise abundance can be obtained using eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:p random"
+
+\end_inset
+
+ in place of 
+\shape italic
+p
+\shape default
+ in eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:density"
+
+\end_inset
+
+.
+ When explanatory covariates are included the Horvitz-Thompson-like estimator
+ (eq 2.44 in Borchers and Burnham 2004) can be used: 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\begin{equation}
+D=\sum_{i=1}^{n}\frac{1}{2wLp_{i}}=\sum_{i=1}^{n}\frac{1}{2wL\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon,z_{i})du\, N(\epsilon,0,\sigma_{\epsilon})\frac{1}{w}d\epsilon}\quad,\label{eq:density-1}
+\end{equation}
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Model fitting code
+\end_layout
+
+\begin_layout Standard
+R code for fitting models using maximum likelihood with likelihood eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
+
+\end_inset
+
+, to plot the fitted model and to compute abundance using eq 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:density-1"
+
+\end_inset
+
+ multipled by 2
+\shape italic
+wL
+\shape default
+ is in the package RandomScale (
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/jlaake/RandomScale
+\end_layout
+
+\end_inset
+
+).
+ In addition, the RandomScale package contains TPL files that were developed
+ to fit the models with ADMB (Fournier et al.
+ 2012) using each of the likelihoods (eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:f likelihood"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
+
+\end_inset
+
+).
+ Additional C++ code was also written to enable use of multinomial weights
+ with Gauss-Hermite integration for the random effects and is contained
+ in the package.
+ From some simulation results using the various likelihood equations, we
+ have found that in ADMB eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+ is less stable than eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:f likelihood"
+
+\end_inset
+
+ when the data were substantially truncated such that the data contains
+ less information about the random effect.
+\end_layout
+
+\begin_layout Standard
+The following generates some simulated data, fits models with the R code
+ using likelihood equations 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+ and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
+
+\end_inset
+
+, and shows plots for each including one with the adjustment of 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\beta_{f}=\beta_{g}+\sigma_{\epsilon}^{2}$
+\end_inset
+
+
+\family default
+\series default
+\shape default
+\size default
+\emph default
+\bar default
+\strikeout default
+\uuline default
+\uwave default
+\noun default
+\color inherit
+:
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<fig=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+x=simdata(n=500,w=Inf,beta_eps=-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+par(mfrow=c(1,3)) 
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random=fitdata(x,w=Inf,beta_eps=-.5)
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit(x,w=max(x),results_random$model$par,nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                 main="eq 4 likelihood")
+\end_layout
+
+\begin_layout Plain Layout
+
+results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+param=results_random_wrong$model$par
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit(x,w=max(x),param,nclass=30,main="eq 8 likelihood")
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit(x,w=max(x),c(param[1]-exp(2*param[2]),param[2]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+       main="eq 8 likelihood
+\backslash
+nadjusted beta")
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Using the same data, we use ADMB to fit models using likelihood equations
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+, 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:f likelihood"
+
+\end_inset
+
+, and 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
+
+\end_inset
+
+ and plot the fitted models with the appropriate adjustments to 
+\family roman
+\series medium
+\shape up
+\size normal
+\emph off
+\bar no
+\strikeout off
+\uuline off
+\uwave off
+\noun off
+\color none
+
+\begin_inset Formula $\beta_{f}$
+\end_inset
+
+.
+ The results from the R code and ADMB are nearly identical (Table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "tab:Comparison_table"
+
+\end_inset
+
+).
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<fig=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+par(mfrow=c(1,3)) 
+\end_layout
+
+\begin_layout Plain Layout
+
+glike=fitadmb(x,w=Inf,likelihood="g")
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit(x,w=Inf,c(glike$coeflist[[1]],glike$coeflist[[2]]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                 main="eq 4 likelihood")
+\end_layout
+
+\begin_layout Plain Layout
+
+f2like=fitadmb(x,w=Inf,likelihood="f2")
+\end_layout
+
+\begin_layout Plain Layout
+
+param=c(f2like$coeflist[[1]],f2like$coeflist[[2]])
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit(x,w=Inf,c(param[1]-exp(2*param[2]),param[2]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                 main="eq 7 likelihood")
+\end_layout
+
+\begin_layout Plain Layout
+
+f1like=fitadmb(x,w=Inf,likelihood="f1")
+\end_layout
+
+\begin_layout Plain Layout
+
+param=c(f1like$coeflist[[1]],f1like$coeflist[[2]])
+\end_layout
+
+\begin_layout Plain Layout
+
+plotfit(x,w=Inf,c(param[1]-exp(2*param[2]),param[2]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                 main="eq 8 likelihood")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The following is an example of a mixed-effects model that can only be fitted
+ at present with the ADMB code and likelihood eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:f likelihood"
+
+\end_inset
+
+.
+ We simulate data from a population with 2000 objects with a larger scale
+ and 1000 objects with a smaller scale.
+ All objects have the same random effect distribution.
+ We fit a model with and without the covariate to the data to the model.
+ The arguments for plotfit are a little clumsy at present and a more flexible
+ structure will be created.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<fig=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+par(mfrow=c(1,2))
+\end_layout
+
+\begin_layout Plain Layout
+
+x1=simdata(n=2000,w=50,beta_eps=-.5,beta=2,fixed=FALSE,reject=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+x2=simdata(n=1000,w=50,beta_eps=-.5,beta=1,fixed=FALSE,reject=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+df=data.frame(covariate=c(rep(0,length(x1)),rep(1,length(x2))),
+\end_layout
+
+\begin_layout Plain Layout
+
+    distance=c(x1,x2))
+\end_layout
+
+\begin_layout Plain Layout
+
+fwlike=fitadmb(df,w=50,formula=~covariate,likelihood="f2")
+\end_layout
+
+\begin_layout Plain Layout
+
+param=c(fwlike$coeflist[[1]],fwlike$coeflist[[2]])
+\end_layout
+
+\begin_layout Plain Layout
+
+Nhatwcov=plotfit(df$distance,w=50,
+\end_layout
+
+\begin_layout Plain Layout
+
+            par=c(param[1]-exp(2*param[3]),param[2],param[3]),
+\end_layout
+
+\begin_layout Plain Layout
+
+            nclass=30,dm=model.matrix(~covariate,df),main="With covariate")
+\end_layout
+
+\begin_layout Plain Layout
+
+flike=fitadmb(df,w=50,formula=~1,likelihood="f2")
+\end_layout
+
+\begin_layout Plain Layout
+
+param=c(flike$coeflist[[1]],flike$coeflist[[2]])
+\end_layout
+
+\begin_layout Plain Layout
+
+Nhatwocov=plotfit(df$distance,w=50,
+\end_layout
+
+\begin_layout Plain Layout
+
+            par=c(param[1]-exp(2*param[2]),param[2]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                 main="Without covariate")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+The fit of each model looks similar in the plots but the model with the
+ covariate was clearly better with a delta AIC of 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(-2*flike$loglik-2*2-(-2*fwlike$loglik-2*3),2)}
+\end_layout
+
+\end_inset
+
+.
+ The estimates of abundance (with covariate: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(Nhatwcov,0)}
+\end_layout
+
+\end_inset
+
+ without covariate: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(Nhatwocov,0)}
+\end_layout
+
+\end_inset
+
+) are similar because when the covariate is excluded from the model the
+ variation from the covariates is absorbed into the variance of the random
+ effect which captures unmodeled heterogeneity.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<echo=FALSE,fig=TRUE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+par(mfrow=c(2,2))
+\end_layout
+
+\begin_layout Plain Layout
+
+param=c(fwlike$coeflist[[1]],fwlike$coeflist[[2]])
+\end_layout
+
+\begin_layout Plain Layout
+
+Nhatwcov0=plotfit(df$distance[df$covariate==0],w=50,
+\end_layout
+
+\begin_layout Plain Layout
+
+            par=c(param[1]-exp(2*param[3]),param[2],param[3]),
+\end_layout
+
+\begin_layout Plain Layout
+
+            nclass=30,dm=model.matrix(~covariate,df[df$covariate==0,]),
+\end_layout
+
+\begin_layout Plain Layout
+
+             main="With covariate value=0")
+\end_layout
+
+\begin_layout Plain Layout
+
+Nhatwcov1=plotfit(df$distance[df$covariate==1],w=50,
+\end_layout
+
+\begin_layout Plain Layout
+
+             par=c(param[1]-exp(2*param[2]),param[2],param[3]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+              dm=model.matrix(~covariate,df[df$covariate==1,]),
+\end_layout
+
+\begin_layout Plain Layout
+
+                  main="With covariate value=1")
+\end_layout
+
+\begin_layout Plain Layout
+
+param=c(flike$coeflist[[1]],flike$coeflist[[2]])
+\end_layout
+
+\begin_layout Plain Layout
+
+Nhatwocov0=plotfit(df$distance[df$covariate==0],w=50,
+\end_layout
+
+\begin_layout Plain Layout
+
+             par=c(param[1]-exp(2*param[2]),param[2]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                  main="Without covariate value=0")
+\end_layout
+
+\begin_layout Plain Layout
+
+Nhatwocov1=plotfit(df$distance[df$covariate==1],w=50,
+\end_layout
+
+\begin_layout Plain Layout
+
+             par=c(param[1]-exp(2*param[2]),param[2]),nclass=30,
+\end_layout
+
+\begin_layout Plain Layout
+
+                  main="Without covariate value=1")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+However, when abundance is estimated for each type of object (with covariate:
+ 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(Nhatwcov0,0)}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(Nhatwcov1,1)}
+\end_layout
+
+\end_inset
+
+; without covariate: 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(Nhatwocov0,0)}
+\end_layout
+
+\end_inset
+
+ and 
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{round(Nhatwocov1,1)}
+\end_layout
+
+\end_inset
+
+) and the plots are shown for each type of object, the importance of including
+ the covariate is obvious.
+ 
+\end_layout
+
+\begin_layout Standard
+\begin_inset Float table
+wide false
+sideways false
+status open
+
+\begin_layout Plain Layout
+\begin_inset Caption
+
+\begin_layout Plain Layout
+\begin_inset CommandInset label
+LatexCommand label
+name "tab:Comparison_table"
+
+\end_inset
+
+Comparison of random scale model fitting results from R and ADMB using simulated
+ data.
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Plain Layout
+\begin_inset Tabular
+<lyxtabular version="3" rows="6" columns="6">
+<features tabularvalignment="middle">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<column alignment="center" valignment="top" width="0">
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Code
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Likelihood eq
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+Log-likelihood
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta_{f}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset Formula $\beta_{g}$
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+log(
 \begin_inset Formula $\sigma_{\epsilon}$
 \end_inset
 
- increases.
- It is the correct likelihood if 
-\begin_inset Formula $\sigma_{\epsilon}=0$
-\end_inset
+)
+\end_layout
 
- (Buckland et al 2001) because the integrals are degenerate; however it
- is not properly conditioned if 
-\begin_inset Formula $\sigma_{\epsilon}>0$
 \end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
- .
- The probability density function 
-\begin_inset Formula $f(x)$
+\begin_layout Plain Layout
+R
+\end_layout
+
 \end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
- for observed distances is the probability an observation was made at distance
+\begin_layout Plain Layout
+eq.
  
-\family default
-\series default
-\shape italic
-\size default
-\emph default
-\bar default
-\strikeout default
-\uuline default
-\uwave default
-\noun default
-\color inherit
-x 
-\shape default
-given it was seen.
- The probability it was seen at x is:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\intop_{-\infty}^{\infty}g(x|\epsilon)N(\epsilon,0,\sigma_{\epsilon})d\epsilon\quad,
-\]
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Standard
-\noindent
-and the probability it was seen at all is:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon\quad,
-\]
-
 \end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-so the proper likelihood is 
-\end_layout
-
-\begin_layout Standard
-\noindent
-\begin_inset Formula 
-\[
-\prod_{i=1}^{n}\frac{\intop_{-\infty}^{\infty}g(x_{i}|\epsilon)\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}{\intop_{-\infty}^{\infty}\int_{0}^{w}g(u|\epsilon)du\, N(\epsilon,0,\sigma_{\epsilon})d\epsilon}
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-If 
-\family roman
-\series medium
-\shape up
-\size normal
-\emph off
-\bar no
-\strikeout off
-\uuline off
-\uwave off
-\noun off
-\color none
-
-\begin_inset Formula $\sigma_{\epsilon}=0$
-\end_inset
-
-, the likelihood is the same as given by Buckland et al.
- (2001).
- A mixed-effects model in which explanatory covariates are included, as
- in approach 2, can be accomplished easily by using:
-\end_layout
-
-\begin_layout Standard
-\begin_inset Formula 
-\[
-\gamma(\epsilon)=\exp(\boldsymbol{X_{z}}\boldsymbol{\beta}+\epsilon)\quad.
-\]
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The following code will simulate data with a random scale for a half-normal
- detection function gx.
- As explained in the comments, the estimated 
-\begin_inset Formula $\beta$
-\end_inset
-
- will not match the value of the supplied argument beta, unless rejection
- sampling is used.
- I found this very confusing at first but if you consider how the data are
- simulated it will become clear that rejection sampling mimics the correct
- likelihood and generating distances with rnorm directly mimics the incorrect
- likelihood.
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-<<echo=FALSE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-set.seed(123)
-\end_layout
-
-\begin_layout Plain Layout
-
-library(mrds)
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-<<>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-# Half-normal detection function
-\end_layout
-
-\begin_layout Plain Layout
-
-gx=function(x,sigma)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-  exp(-.5*(x/sigma)^2)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-simdata=function(n=500,beta=2,beta_eps=-1,w=Inf,
-\end_layout
-
-\begin_layout Plain Layout
-
-                         reject=TRUE,b=10000)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-# n        - sample size
-\end_layout
-
-\begin_layout Plain Layout
-
-# beta     - scale intercept
-\end_layout
-
-\begin_layout Plain Layout
-
-# beta_eps - beta for random effect sigma
-\end_layout
-
-\begin_layout Plain Layout
-
-# w        - width of transect
-\end_layout
-
-\begin_layout Plain Layout
-
-# reject   - if TRUE uses brute force rejection sampling to 
-\end_layout
-
-\begin_layout Plain Layout
-
-#            generate distances;if w=Inf, it uses a large w 
-\end_layout
-
-\begin_layout Plain Layout
-
-#            to avoid any appreciable truncation
-\end_layout
-
-\begin_layout Plain Layout
-
-# b        - number of deviates generated in a batch for 
-\end_layout
-
-\begin_layout Plain Layout
-
-#             rejection sampling
-\end_layout
-
-\begin_layout Plain Layout
-
-#         
-\end_layout
-
-\begin_layout Plain Layout
-
-# If reject==FALSE, it generates distances directly with 
-\end_layout
-
-\begin_layout Plain Layout
-
-# rnorm but if this approach is used, the estimated beta with 
-\end_layout
-
-\begin_layout Plain Layout
-
-# the correct likelihood will not match the generating beta but 
-\end_layout
-
-\begin_layout Plain Layout
-
-# this is not bias in the usual sense.
- It will match the beta
-\end_layout
-
-\begin_layout Plain Layout
-
-# from the incorrect likelihood.
-\end_layout
-
-\begin_layout Plain Layout
-
-	if(reject)
-\end_layout
-
-\begin_layout Plain Layout
-
-	{
-\end_layout
-
-\begin_layout Plain Layout
-
-		if(w==Inf)
-\end_layout
-
-\begin_layout Plain Layout
-
-			w=3*exp(beta+3*exp(beta_eps))
-\end_layout
-
-\begin_layout Plain Layout
-
-		x=NULL
-\end_layout
-
-\begin_layout Plain Layout
-
-        while(length(x)<n)
-\end_layout
-
-\begin_layout Plain Layout
-
-		{
-\end_layout
-
-\begin_layout Plain Layout
-
-			u=runif(b,0,w)
-\end_layout
-
-\begin_layout Plain Layout
-
-			sigma=exp(beta+rnorm(b,0,1)*exp(beta_eps))
-\end_layout
-
-\begin_layout Plain Layout
-
-			seen=gx(u,sigma)>runif(b,0,1)
-\end_layout
-
-\begin_layout Plain Layout
-
-			x=c(x,u[seen])
-\end_layout
-
-\begin_layout Plain Layout
-
-		}
-\end_layout
-
-\begin_layout Plain Layout
-
-		return(x[1:n])
-\end_layout
-
-\begin_layout Plain Layout
-
-	}else
-\end_layout
-
-\begin_layout Plain Layout
-
-	{
-\end_layout
-
-\begin_layout Plain Layout
-
-		sigma=exp(beta+rnorm(n,0,1)*exp(beta_eps))
-\end_layout
-
-\begin_layout Plain Layout
-
-		x=abs(rnorm(n,0,sigma))
-\end_layout
-
-\begin_layout Plain Layout
-
-		return(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-	}
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-x=simdata(n=500,w=Inf,beta_eps=-.5) 
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The following is the code needed to fit and plot the model.
- The plotfit function uses histline from the mrds package which is on CRAN.
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-<<>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-# Half-normal * density(eps)
-\end_layout
-
-\begin_layout Plain Layout
-
-gx.eps=function(x,eps,par)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-    sigma=exp(par[1]+eps*exp(par[2]))
-\end_layout
-
-\begin_layout Plain Layout
-
-    gx(x,sigma)*dnorm(eps,0,1)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-# Average half-normal integrated over distribution of eps
-\end_layout
-
-\begin_layout Plain Layout
-
-avg_gx=function(x,par,weps=5)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-    gx=vector("numeric",length=length(x))
-\end_layout
-
-\begin_layout Plain Layout
-
-    geps.x=function(eps,x,par)gx.eps(x,eps,par)
-\end_layout
-
-\begin_layout Plain Layout
-
-    for(i in 1:length(x))
-\end_layout
-
-\begin_layout Plain Layout
-
-     gx[i]=integrate(geps.x,-weps,weps,x=x[i],par=par)$value
-\end_layout
-
-\begin_layout Plain Layout
-
-    gx
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-# Average detection probability * density eps
-\end_layout
-
-\begin_layout Plain Layout
-
-mu=function(eps,w,par)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-  mu=vector("numeric",length=length(eps))
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(i in 1:length(eps))
-\end_layout
-
-\begin_layout Plain Layout
-
-  {
-\end_layout
-
-\begin_layout Plain Layout
-
-    sigma=exp(par[1]+eps[i]*exp(par[2]))
-\end_layout
-
-\begin_layout Plain Layout
-
-    mu[i]=sigma*sqrt(2*pi)*(pnorm(w,0,sigma)-.5)*dnorm(eps[i],0,1)
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  mu
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-# Average detection probability - integrated over eps
-\end_layout
-
-\begin_layout Plain Layout
-
-avg_mu=function(w,par,weps=5)
-\end_layout
-
-\begin_layout Plain Layout
-
-	integrate(mu,-weps,weps,w=w,par=par)$value
-\end_layout
-
-\begin_layout Plain Layout
-
-# Negative log-likelihood function 
-\end_layout
-
-\begin_layout Plain Layout
-
-flnl=function(par,x,w,weps=5,wrong=FALSE)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-  lnl=0
-\end_layout
-
-\begin_layout Plain Layout
-
-  for(i in 1:length(x))
-\end_layout
-
-\begin_layout Plain Layout
-
-  {
-\end_layout
-
-\begin_layout Plain Layout
-
-     if(length(par)>1)
-\end_layout
-
-\begin_layout Plain Layout
-
-         if(wrong)
-\end_layout
-
-\begin_layout Plain Layout
-
-            lnl=lnl-log(integrate(fx.eps,-weps,weps,
-\end_layout
-
-\begin_layout Plain Layout
-
-                          x=x[i],w=w,par=par)$value)
-\end_layout
-
-\begin_layout Plain Layout
-
-         else
-\end_layout
-
-\begin_layout Plain Layout
-
-            lnl=lnl-log(avg_gx(x[i],par)/
-\end_layout
-
-\begin_layout Plain Layout
-
-                      avg_mu(w,par,weps))
-\end_layout
-
-\begin_layout Plain Layout
-
-	 else
-\end_layout
-
-\begin_layout Plain Layout
-
-	 {
-\end_layout
-
-\begin_layout Plain Layout
-
-		 sigma=exp(par[1])
-\end_layout
-
-\begin_layout Plain Layout
-
-		 mu=sigma*sqrt(2*pi)*(pnorm(w,0,sigma)-.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-		 lnl=lnl-log(gx(x[i],sigma=sigma))+log(mu)
-\end_layout
-
-\begin_layout Plain Layout
-
-	 }
-\end_layout
-
-\begin_layout Plain Layout
-
-  }
-\end_layout
-
-\begin_layout Plain Layout
-
-  lnl
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-fitdata=function(x,beta=2,beta_eps=-1,w=Inf,
-\end_layout
-
-\begin_layout Plain Layout
-
-		         weps=5,lower=beta/2,upper=2*beta,
-\end_layout
-
-\begin_layout Plain Layout
-
-				 wrong=FALSE)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-n=length(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-if(is.null(beta_eps))
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-	# fit fixed scale model
-\end_layout
-
-\begin_layout Plain Layout
-
-	model=optimize(flnl,lower=lower,upper=upper,
-\end_layout
-
-\begin_layout Plain Layout
-
-                          x=x,w=w,weps=weps)
-\end_layout
-
-\begin_layout Plain Layout
-
-	model$par=model$minimum
-\end_layout
-
-\begin_layout Plain Layout
-
-}else
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-#   fit random scale model 
-\end_layout
-
-\begin_layout Plain Layout
-
-	model=optim(par=c(beta,beta_eps),
-\end_layout
-
-\begin_layout Plain Layout
-
-       flnl,x=x,w=w,weps=weps,wrong=wrong)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-model$x=x
-\end_layout
-
-\begin_layout Plain Layout
-
-model$w=w
-\end_layout
-
-\begin_layout Plain Layout
-
-return(list(model=model))
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-plotfit=function(result,nclass=NULL,weps=5,main=NULL)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-# Create plot of fit; uses histline from mrds
-\end_layout
-
-\begin_layout Plain Layout
-
-par=result$model$par
-\end_layout
-
-\begin_layout Plain Layout
-
-if(length(par)<2)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-	# compute fixed mu
-\end_layout
-
-\begin_layout Plain Layout
-
-	avg_mu_est=exp(par)*sqrt(2*pi)*
-\end_layout
-
-\begin_layout Plain Layout
-
-            (pnorm(result$model$w,0,exp(par))-.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-}else
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-	# Compute average_mu
-\end_layout
-
-\begin_layout Plain Layout
-
-	avg_mu_est=avg_mu(w=result$model$w,par=par,weps=weps)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-# Compute Nhat if W<Inf
-\end_layout
-
-\begin_layout Plain Layout
-
-if(result$model$w!=Inf)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-	Nhat=length(x)/(avg_mu_est/result$model$w)
-\end_layout
-
-\begin_layout Plain Layout
-
-}else
-\end_layout
-
-\begin_layout Plain Layout
-
-	Nhat=NULL
-\end_layout
-
-\begin_layout Plain Layout
-
-result$Nhat=Nhat
-\end_layout
-
-\begin_layout Plain Layout
-
-x=result$model$x
-\end_layout
-
-\begin_layout Plain Layout
-
-max_x=max(x)
-\end_layout
-
-\begin_layout Plain Layout
-
-if(is.null(nclass))
-\end_layout
-
-\begin_layout Plain Layout
-
-	nints=ceiling(sqrt(length(x)))
-\end_layout
-
-\begin_layout Plain Layout
-
-else
-\end_layout
-
-\begin_layout Plain Layout
-
-	nints=nclass
-\end_layout
-
-\begin_layout Plain Layout
-
-int_width=max_x/nints
-\end_layout
-
-\begin_layout Plain Layout
-
-breaks=int_width*(0:nints)
-\end_layout
-
-\begin_layout Plain Layout
-
-ints=(0:100)*max_x/100
-\end_layout
-
-\begin_layout Plain Layout
-
-hh=hist(x,plot=F,breaks=breaks)
-\end_layout
-
-\begin_layout Plain Layout
-
-bars=(hh$counts/(sum(hh$counts)*int_width))*avg_mu_est
-\end_layout
-
-\begin_layout Plain Layout
-
-if(length(par)<2)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-   gx=gx(ints,sigma=exp(par))
-\end_layout
-
-\begin_layout Plain Layout
-
-}else
-\end_layout
-
-\begin_layout Plain Layout
-
-   gx=avg_gx(ints,par=par)
-\end_layout
-
-\begin_layout Plain Layout
-
-mrds:::histline(bars,breaks,ylim=c(0,max(c(1,bars))),
-\end_layout
-
-\begin_layout Plain Layout
-
-      xlab="Distance",ylab="Detection probability",main=main)
-\end_layout
-
-\begin_layout Plain Layout
-
-lines(ints,gx)
-\end_layout
-
-\begin_layout Plain Layout
-
-return(result)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-Notice that the fitting function fitdata has an argument wrong that is passed
- to the function flnl which computes the negative log-likelihood.
- If wrong is TRUE then it uses the incorrect likelihood to demonstrate the
- fitted model with the incorrect likelihood.
- The incorrect likelihood uses the following functions:
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-<<>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-# pdf - for incorrect likelihood 
-\end_layout
-
-\begin_layout Plain Layout
-
-fx=function(x,sigma,w)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
 \begin_layout Plain Layout
-
-	mu=sigma*sqrt(2*pi)*(pnorm(w,0,sigma)-.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-	exp(-.5*(x/sigma)^2)/mu
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-# pdf * density(eps) - for incorrect likelihood 
-\end_layout
-
-\begin_layout Plain Layout
-
-fx.eps=function(eps,x,par,w)
-\end_layout
-
-\begin_layout Plain Layout
-
-{
-\end_layout
-
-\begin_layout Plain Layout
-
-	sigma=exp(par[1]+eps*exp(par[2]))
-\end_layout
-
-\begin_layout Plain Layout
-
-	fx(x,sigma,w)*dnorm(eps,0,1)
-\end_layout
-
-\begin_layout Plain Layout
-
-}
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-The following fits the simulated data with both likelihoods to demonstrate
- the differences in the fitted detection function curves to the data:
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-<<fig=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-par(mfrow=c(1,2)) 
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random=fitdata(x,w=Inf,beta_eps=-.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random=plotfit(results_random,nclass=30)
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random_wrong=plotfit(results_random_wrong,nclass=30)
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-\noindent
-The estimated parameters with the correct likelihood are 
-\begin_inset Formula $\hat{\beta}$
-\end_inset
-
-=
 \begin_inset ERT
 status open
 
@@ -1781,16 +2022,29 @@ status open
 
 
 \backslash
-Sexpr{round(results_random$model$par[1],3)}
+Sexpr{sprintf("%7.2f",-results_random$model$val)}
 \end_layout
 
 \end_inset
 
- and 
-\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
-\end_inset
 
-=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -1798,18 +2052,20 @@ status open
 
 
 \backslash
-Sexpr{round(results_random$model$par[2],3)}
+Sexpr{ sprintf("%5.3f",results_random$model$par[1])}
 \end_layout
 
 \end_inset
 
- which are quite close to the true values (beta=2,beta_eps=-0.5) used to
- simulate the data.
- The estimated parameters with the incorrect likelihood are 
-\begin_inset Formula $\hat{\beta}$
-\end_inset
 
-=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -1817,106 +2073,48 @@ status open
 
 
 \backslash
-Sexpr{round(results_random_wrong$model$par[1],3)}
+Sexpr{sprintf("%5.3f",results_random$model$par[2])}
 \end_layout
 
 \end_inset
 
- and 
-\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
-\end_inset
 
-=
-\begin_inset ERT
-status open
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
 \begin_layout Plain Layout
-
-
-\backslash
-Sexpr{round(results_random_wrong$model$par[2],3)}
+R
 \end_layout
 
 \end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-.
- The incorrect likelihood provides the same estimate of 
-\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
-\end_inset
-
- but an estimate of 
-\begin_inset Formula $\hat{\beta}$
-\end_inset
-
- that is too large as reflected in the lack of fit.
+\begin_layout Plain Layout
+eq.
  
-\end_layout
-
-\begin_layout Standard
-The following demonstrates what happens when rejection sampling is not used.
-\end_layout
-
-\begin_layout Standard
-\begin_inset ERT
-status open
-
-\begin_layout Plain Layout
-
-<<fig=TRUE>>=
-\end_layout
-
-\begin_layout Plain Layout
-
-x=simdata(n=500,w=Inf,beta_eps=-.5,reject=FALSE)
-\end_layout
-
-\begin_layout Plain Layout
-
-par(mfrow=c(1,2)) 
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random=fitdata(x,w=Inf,beta_eps=-.5)
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random=plotfit(results_random,nclass=30)
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
-\end_layout
-
-\begin_layout Plain Layout
-
-results_random_wrong=plotfit(results_random_wrong,nclass=30)
-\end_layout
-
-\begin_layout Plain Layout
-
-\end_layout
-
-\begin_layout Plain Layout
-
-@
-\end_layout
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
 
 \end_inset
 
 
 \end_layout
 
-\begin_layout Standard
-\noindent
-The lack of fit remains for the incorrect likelihood but now the estimated
- parameters with the correct likelihood are 
-\begin_inset Formula $\hat{\beta}$
 \end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
 
-=
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -1924,16 +2122,20 @@ status open
 
 
 \backslash
-Sexpr{round(results_random$model$par[1],3)}
+Sexpr{sprintf("%7.2f",-results_random_wrong$model$val)}
 \end_layout
 
 \end_inset
 
- and 
-\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
-\end_inset
 
-=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -1941,16 +2143,20 @@ status open
 
 
 \backslash
-Sexpr{round(results_random$model$par[2],3)}
+Sexpr{sprintf("%5.3f",results_random_wrong$model$par[1])}
 \end_layout
 
 \end_inset
 
- and the estimated parameters with the incorrect likelihood are 
-\begin_inset Formula $\hat{\beta}$
-\end_inset
 
-=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -1958,16 +2164,21 @@ status open
 
 
 \backslash
-Sexpr{round(results_random_wrong$model$par[1],3)}
+Sexpr{sprintf("%5.3f",results_random_wrong$model$par[1]-exp(results_random_wrong$
+model$par[2]*2))}
 \end_layout
 
 \end_inset
 
- and 
-\begin_inset Formula $\log(\hat{\sigma}_{\epsilon})$
-\end_inset
 
-=
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
 \begin_inset ERT
 status open
 
@@ -1975,19 +2186,351 @@ status open
 
 
 \backslash
-Sexpr{round(results_random_wrong$model$par[2],3)}
+Sexpr{sprintf("%5.3f",results_random_wrong$model$par[2])}
 \end_layout
 
 \end_inset
 
-.
- Now the incorrect likelihood provides a 
-\begin_inset Formula $\hat{\beta}$
-\end_inset
 
- that is close to the generating value but the value for the correct likelihood
- is too small but is the best estimate for the data.
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ADMB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+eq.
  
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:g likelihood"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%7.2f",glike$loglik)}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+NA
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",glike$coeflist[[1]])}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",glike$coeflist[[2]])}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ADMB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:f likelihood"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%7.2f",f2like$loglik)}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",f2like$coeflist[[1]])}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",f2like$coeflist[[1]]-exp(2*f2like$coeflist[[2]]))}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",f2like$coeflist[[2]])}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ADMB
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:Incorrect likelihood"
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%7.2f",f1like$loglik)}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",f1like$coeflist[[1]])}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",f1like$coeflist[[1]]-exp(2*f2like$coeflist[[2]]))}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="center" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+Sexpr{sprintf("%5.3f",f1like$coeflist[[2]])}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset
+
+
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \end_body

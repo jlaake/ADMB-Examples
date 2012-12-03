@@ -21,15 +21,15 @@ DATA_SECTION
     init_matrix pF(1,L,1,2);           // p fixed matrix with index in first column and value in second column
         
 PARAMETER_SECTION
-    init_vector phibeta(1,kphi);       // parameter vector for Phi
-    init_vector pbeta(1,kp);           // parameter vector for p
-    init_bounded_number phisigeps(0.000001,6);   
+    init_vector phibeta(1,kphi,1);       // parameter vector for Phi
+    init_vector pbeta(1,kp,1);           // parameter vector for p
+    init_number phisigeps(2);   
                                        // sigma for random effect in phi;             
-    init_bounded_number psigeps(0.000001,6);   
+    init_number psigeps(2);   
                                        // sigma for random effect in p;             
     objective_function_value f;        // objective function - negative log-likelihood
-    random_effects_vector phiu(1,n);   // random effect for scale
-    random_effects_vector pu(1,n);     // random effect for scale
+    random_effects_vector phiu(1,n,2);   // random effect for scale
+    random_effects_vector pu(1,n,2);     // random effect for scale
 
 TOP_OF_MAIN_SECTION
   arrmblsize=5000000;                  // not sure how to set this as a function of problem size
@@ -48,8 +48,8 @@ SEPARABLE_FUNCTION void ll_i(const int i, const dvariable& phisigeps,const dvari
     dvar_vector cump(1,m);             // cummulative probability of being seen across occasions
     dvariable pch;                     // probability of capture history
     int i1,i2,j;                       // miscellaneous ints
-    dvariable phieps=phiu*phisigeps;   // scaled re for phi
-    dvariable peps=pu*psigeps;         // scaled re for p 
+    dvariable phieps=phiu*exp(phisigeps);   // scaled re for phi
+    dvariable peps=pu*exp(psigeps);         // scaled re for p 
                                                                    //    
     phi=0;                                                         // set all phi values to 0
     phicumprod=1.0;                                                // set cummulative survival to 1
@@ -68,14 +68,13 @@ SEPARABLE_FUNCTION void ll_i(const int i, const dvariable& phisigeps,const dvari
     pch=0.0;                                                       // initialize prob of the capture history to 0
     for(j=lst(i);j<=((1-loc(i))*m+loc(i)*lst(i));j++)              // loop over last occasion to m unless loss on capture
     {                                                              //  to compute prob of the capture history 
-       i2=i1+j;                                                       // index occasion
+       i2=i1+j;                                                    // index occasion
        if(loc(i)==1)
           pch=pch+cump(j)*phicumprod(j);                           // probability of history given possible last occasion alive
        else       
           pch=pch+cump(j)*phicumprod(j)*(1-phi(j));                // probability of history given possible last occasion alive
     }   
-    if(pch < 1E-15) pch=1E-307;                                    // avoid log(0)
-    f-= log(pch);                                                  // sum log-likelihood log(pr(ch))
+    f-= log(pch+.0000000000000001);                                // sum log-likelihood log(pr(ch))
     f -= -0.5*square(pu)-0.9189385332046727;                       // normal random effect distr; constant is log(sqrt(2*pi))
     f -= -0.5*square(phiu)-0.9189385332046727;                     // normal random effect distr; constant is log(sqrt(2*pi))
 

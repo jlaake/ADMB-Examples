@@ -1,0 +1,1484 @@
+#LyX 2.0 created this file. For more info see http://www.lyx.org/
+\lyxformat 413
+\begin_document
+\begin_header
+\textclass article
+\begin_preamble
+
+\usepackage{amsthm}\usepackage{epsfig}\usepackage{psfrag}\usepackage{lineno}
+
+\bibliographystyle{apalike}
+
+%\setlength{\evensidemargin}{0in} \setlength{\oddsidemargin}{0in}
+%\setlength{\topmargin}{0.0in} \setlength{\textwidth}{6.5in}
+%\setlength{\textheight}{9in} \setlength{\topskip}{0in}
+%\setlength{\headheight}{0in} \setlength{\headsep}{0in}
+\usepackage{pdflscape}
+\end_preamble
+\use_default_options false
+\begin_modules
+sweave
+\end_modules
+\maintain_unincluded_children false
+\language english
+\language_package none
+\inputencoding auto
+\fontencoding default
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command default
+\index_command default
+\paperfontsize 12
+\spacing single
+\use_hyperref false
+\papersize default
+\use_geometry true
+\use_amsmath 2
+\use_esint 1
+\use_mhchem 0
+\use_mathdots 0
+\cite_engine natbib_authoryear
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\use_refstyle 0
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Fitting Cormack-Jolly-Seber Models with Individual Heterogeneity to Capture-Reca
+pture Data with ADMB and R2admb
+\end_layout
+
+\begin_layout Author
+Jeff Laake
+\end_layout
+
+\begin_layout Standard
+Cormack-Jolly-Seber models are often used to estimate survival from release-reca
+pture data.
+ Some details are provided in 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/downloads/jlaake/ADMB-Examples/CJSFixedEffects.pdf
+\end_layout
+
+\end_inset
+
+.
+ This is the abreviated version which outlines a model which includes individual
+ heterogeneity through a random effect.
+ Let 
+\begin_inset Formula $\omega_{i}$
+\end_inset
+
+ be the capture history for the 
+\shape italic
+i
+\begin_inset script superscript
+
+\begin_layout Plain Layout
+th
+\end_layout
+
+\end_inset
+
+
+\shape default
+ animal which is a vector of 
+\shape italic
+m
+\shape default
+ values (
+\begin_inset Formula $\omega_{i1},\omega_{i2},...,\omega_{im})$
+\end_inset
+
+ where 
+\begin_inset Formula $\omega_{ij}$
+\end_inset
+
+ is 1 if animal 
+\shape italic
+i
+\shape default
+ was intially released or recaptured on occasion 
+\shape italic
+j
+\shape default
+ and 0 otherwise.
+ Let 
+\begin_inset Formula $f_{i}$
+\end_inset
+
+ be the occasion the animal was first released and 
+\begin_inset Formula $l_{i}$
+\end_inset
+
+ the last occasion the animal was seen.
+ The CJS log-likelihood is:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+lnL={\displaystyle \sum_{i=1}^{n}ln(Pr(\omega_{i}))}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where ignoring loss on captures 
+\begin_inset Formula 
+\[
+Pr(\omega_{i})=\sum_{d=l_{i}}^{m}\;\prod_{j=f_{i}+1}^{d}p_{ij}^{\omega_{ij}}(1-p_{ij})^{(1-\omega_{ij})}\left(\prod_{j=f_{i}}^{d-1}\phi_{ij}\right)(1-\phi_{id})\quad,
+\]
+
+\end_inset
+
+which depends on the parameters 
+\begin_inset Formula $p_{ij}$
+\end_inset
+
+ for capture-probability and 
+\begin_inset Formula $\phi_{ij}$
+\end_inset
+
+ for survival.
+ Consider a model in which both capture and survival are subject to individual
+ heterogeneity which was proposed by 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "gimenez2010"
+
+\end_inset
+
+.
+ I'll use a logit link for both parameters:
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+log(\phi_{ij}/(1-\phi_{ij}))=\mu_{\phi}+\varepsilon_{\phi i}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+log(p_{ij}/(1-p_{ij}))=\mu_{p}+\varepsilon_{pi}
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+where 
+\begin_inset Formula $\varepsilon_{pi}$
+\end_inset
+
+ are iid 
+\begin_inset Formula $N(0,\sigma_{p}^{2})$
+\end_inset
+
+ and 
+\begin_inset Formula $\varepsilon_{\phi i}$
+\end_inset
+
+ are iid 
+\begin_inset Formula $N(0,\sigma_{\phi}^{2})$
+\end_inset
+
+ and the two sources of error are independent.
+ Then the log-likelihood is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+lnL(\mu_{p},\mu_{\phi},\sigma_{p}^{2},\sigma_{\phi}^{2},p|\omega_{1},\omega_{2},...,\omega_{n})=\sum_{i=1}^{n}\log\left[\int_{\varepsilon_{p}}\int_{\varepsilon_{\phi}}Pr(\omega_{i}|\varepsilon_{p},\varepsilon_{\phi})d\varepsilon_{p}d\varepsilon_{\phi}\right]
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+It is also possible to create models with both temporal and individual heterogen
+eity.
+ Consider a model with temporal and invididual heterogeneity in survival
+ but for simplicity constant capture probability.
+ Let
+\end_layout
+
+\begin_layout Standard
+\noindent
+\begin_inset Formula 
+\[
+log(\phi_{ij}/(1-\phi_{ij}))=\mu+\varepsilon_{i}+\gamma_{j}
+\]
+
+\end_inset
+
+where 
+\begin_inset Formula $\varepsilon_{i}$
+\end_inset
+
+ are iid 
+\begin_inset Formula $N(0,\sigma_{\varepsilon}^{2})$
+\end_inset
+
+ and 
+\begin_inset Formula $\gamma_{i}$
+\end_inset
+
+ are iid 
+\begin_inset Formula $N(0,\sigma_{\gamma}^{2})$
+\end_inset
+
+ and the two sources of error are independent.
+ Then the likelihood is
+\end_layout
+
+\begin_layout Standard
+\begin_inset Formula 
+\[
+L(\mu,\sigma_{\varepsilon}^{2},\sigma_{\gamma}^{2},p|\omega_{1},\omega_{2},...,\omega_{n})=\dotsint_{\gamma_{1},...\gamma_{K}}\left[\prod_{i=1}^{n}\int_{\varepsilon}Pr(\omega_{i}|\gamma,\varepsilon)d\varepsilon\right]d\gamma_{1}...d\gamma_{K}\quad.
+\]
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Here I provide an example with individual heterogeneity only and fit the
+ same model with the implementation of the 
+\begin_inset CommandInset citation
+LatexCommand citet
+key "gimenez2010"
+
+\end_inset
+
+ model in MARK (
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "White1999"
+
+\end_inset
+
+)using the RMark interface (
+\begin_inset CommandInset citation
+LatexCommand citealp
+key "Laake2008"
+
+\end_inset
+
+).
+ The example uses admbcjsre.tpl file shown at the end of this document.
+ The structure is similar to the fixed effects CJS TPL file (admbcjs.tpl
+ as described in 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+https://github.com/downloads/jlaake/ADMB-Examples/CJSFixedEffects.pdf
+\end_layout
+
+\end_inset
+
+) but the differences are as follows:
+\end_layout
+
+\begin_layout Itemize
+definition of random_effects_vectors, pu and phiu, for 
+\begin_inset Formula $p_{ij}$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi_{ij}$
+\end_inset
+
+ and parameters for the standard deviations of the random effect distributions
+ (psigeps and phisigeps respectively)
+\end_layout
+
+\begin_layout Itemize
+the likelihood contribution for each animal is computed in a SEPARABLE_FUNCTION
+ ll_i and the PROCEDURE_SECTION is a single loop over 
+\shape italic
+i
+\shape default
+=1,
+\shape italic
+n 
+\shape default
+that calls ll_i.
+\end_layout
+
+\begin_layout Itemize
+the likelihood includes standardized normal components for each random effect
+\end_layout
+
+\begin_layout Standard
+Below is some R code that simulates data with random effects in both 
+\begin_inset Formula $p_{ij}$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi_{ij}$
+\end_inset
+
+ and then compiles and runs the ADMB program and the MARK equivalent on
+ the same data.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<echo=FALSE>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+prepare_admb()
+\end_layout
+
+\begin_layout Plain Layout
+
+set.seed(123)
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+# Number of histories
+\end_layout
+
+\begin_layout Plain Layout
+
+n=500
+\end_layout
+
+\begin_layout Plain Layout
+
+# Number of occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+nocc=10
+\end_layout
+
+\begin_layout Plain Layout
+
+# Matrix of survival events - fixed survival
+\end_layout
+
+\begin_layout Plain Layout
+
+alive=matrix(rbinom(n*(nocc-1),1,.9),ncol=nocc-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Cummulative survival events (once dead stays dead)
+\end_layout
+
+\begin_layout Plain Layout
+
+alive=t(apply(alive,1,cumprod))
+\end_layout
+
+\begin_layout Plain Layout
+
+# Individual variation in capture probability
+\end_layout
+
+\begin_layout Plain Layout
+
+p=plogis(rnorm(n,0,1))
+\end_layout
+
+\begin_layout Plain Layout
+
+# Capture events
+\end_layout
+
+\begin_layout Plain Layout
+
+seen=matrix(rbinom(n*(nocc-1),1,rep(p,each=nocc-1)),byrow=T,ncol=nocc-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Construct capture history matrix for a single release cohort
+\end_layout
+
+\begin_layout Plain Layout
+
+chmat=cbind(rep(1,n),seen*alive)
+\end_layout
+
+\begin_layout Plain Layout
+
+ch=apply(chmat,1,paste,collapse="")
+\end_layout
+
+\begin_layout Plain Layout
+
+# Create dataframe with ch values
+\end_layout
+
+\begin_layout Plain Layout
+
+test=data.frame(ch=ch,stringsAsFactors=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+# detach RMark if attached and attach marked package
+\end_layout
+
+\begin_layout Plain Layout
+
+if(length(grep("RMark",.packages()))!=0)detach("package:RMark")
+\end_layout
+
+\begin_layout Plain Layout
+
+library(marked)
+\end_layout
+
+\begin_layout Plain Layout
+
+# process data frame but don't accumulate same capture histories
+\end_layout
+
+\begin_layout Plain Layout
+
+test.proc=process.data(test,model="cjs",begin.time=1,accumulate=F)
+\end_layout
+
+\begin_layout Plain Layout
+
+# create design data
+\end_layout
+
+\begin_layout Plain Layout
+
+test.ddl=make.design.data(test.proc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+admb.mod=crm(test.proc,test.ddl,use.admb=TRUE,re=TRUE,
+\end_layout
+
+\begin_layout Plain Layout
+
+              compile=TRUE,extra.args="-gh 15")
+\end_layout
+
+\begin_layout Plain Layout
+
+# Show results
+\end_layout
+
+\begin_layout Plain Layout
+
+admb.mod
+\end_layout
+
+\begin_layout Plain Layout
+
+# Now fit the same model with MARK via RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+# detach marked and attach RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+detach("package:marked")
+\end_layout
+
+\begin_layout Plain Layout
+
+library(RMark)
+\end_layout
+
+\begin_layout Plain Layout
+
+# process same dataframe for RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+test.proc=process.data(test,model="CJSRandom",begin.time=1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# make design data (different format from marked)
+\end_layout
+
+\begin_layout Plain Layout
+
+test.ddl=make.design.data(test.proc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+mark.mod=mark(test.proc,test.ddl,output=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+# show results
+\end_layout
+
+\begin_layout Plain Layout
+
+summary(mark.mod,brief=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+# cleanup files
+\end_layout
+
+\begin_layout Plain Layout
+
+cleanup(ask=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+clean_admb("admbcjsre")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\noindent
+There are slight differences that are probably due to slight numerical differenc
+es but may deserve further exploration.
+ 
+\end_layout
+
+\begin_layout Standard
+A mixed-effects model with individual heterogeneity can be created by specifying
+ a formula for 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $\phi$
+\end_inset
+
+.
+ Below is an example using some simulated data with a fixed sex effect as
+ well as individual variation in 
+\shape italic
+p
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+<<>>=
+\end_layout
+
+\begin_layout Plain Layout
+
+# Number of histories
+\end_layout
+
+\begin_layout Plain Layout
+
+n=500
+\end_layout
+
+\begin_layout Plain Layout
+
+# Number of occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+nocc=10
+\end_layout
+
+\begin_layout Plain Layout
+
+# Matrix of survival events - fixed survival
+\end_layout
+
+\begin_layout Plain Layout
+
+alive=matrix(rbinom(n*(nocc-1),1,.9),ncol=nocc-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Cummulative survival events (once dead stays dead)
+\end_layout
+
+\begin_layout Plain Layout
+
+alive=t(apply(alive,1,cumprod))
+\end_layout
+
+\begin_layout Plain Layout
+
+# Individual variation in capture probability - with fixed sex effect
+\end_layout
+
+\begin_layout Plain Layout
+
+p=plogis(rnorm(n,0,1)+0.5*c(rep(0,n/2),rep(1,n/2)))
+\end_layout
+
+\begin_layout Plain Layout
+
+# Capture events
+\end_layout
+
+\begin_layout Plain Layout
+
+seen=matrix(rbinom(n*(nocc-1),1,rep(p,each=nocc-1)),byrow=T,ncol=nocc-1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Construct capture history matrix for a single release cohort
+\end_layout
+
+\begin_layout Plain Layout
+
+chmat=cbind(rep(1,n),seen*alive)
+\end_layout
+
+\begin_layout Plain Layout
+
+ch=apply(chmat,1,paste,collapse="")
+\end_layout
+
+\begin_layout Plain Layout
+
+# Create dataframe with ch values
+\end_layout
+
+\begin_layout Plain Layout
+
+test=data.frame(ch=ch,sex=c(rep(0,n/2),rep(1,n/2)),stringsAsFactors=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+# detach RMark if attached and attach marked package
+\end_layout
+
+\begin_layout Plain Layout
+
+if(length(grep("RMark",.packages()))!=0)detach("package:RMark")
+\end_layout
+
+\begin_layout Plain Layout
+
+library(marked)
+\end_layout
+
+\begin_layout Plain Layout
+
+# process data frame but don't accumulate same capture histories
+\end_layout
+
+\begin_layout Plain Layout
+
+test.proc=process.data(test,model="cjs",begin.time=1,accumulate=F)
+\end_layout
+
+\begin_layout Plain Layout
+
+# create design data
+\end_layout
+
+\begin_layout Plain Layout
+
+test.ddl=make.design.data(test.proc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# Fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+admb.mod=crm(test.proc,test.ddl,
+\end_layout
+
+\begin_layout Plain Layout
+
+             model.parameters=list(p=list(formula=~sex)),
+\end_layout
+
+\begin_layout Plain Layout
+
+             use.admb=TRUE,re=TRUE,compile=TRUE,extra.args="-gh 15")
+\end_layout
+
+\begin_layout Plain Layout
+
+# Show results
+\end_layout
+
+\begin_layout Plain Layout
+
+admb.mod
+\end_layout
+
+\begin_layout Plain Layout
+
+# Now fit the same model with MARK via RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+# detach marked and attach RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+detach("package:marked")
+\end_layout
+
+\begin_layout Plain Layout
+
+library(RMark)
+\end_layout
+
+\begin_layout Plain Layout
+
+# process same dataframe for RMark
+\end_layout
+
+\begin_layout Plain Layout
+
+test.proc=process.data(test,model="CJSRandom",begin.time=1)
+\end_layout
+
+\begin_layout Plain Layout
+
+# make design data (different format from marked)
+\end_layout
+
+\begin_layout Plain Layout
+
+test.ddl=make.design.data(test.proc)
+\end_layout
+
+\begin_layout Plain Layout
+
+# fit model
+\end_layout
+
+\begin_layout Plain Layout
+
+mark.mod=mark(test.proc,test.ddl,
+\end_layout
+
+\begin_layout Plain Layout
+
+         model.parameters=list(p=list(formula=~sex)),
+\end_layout
+
+\begin_layout Plain Layout
+
+                 output=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+# show results
+\end_layout
+
+\begin_layout Plain Layout
+
+summary(mark.mod,brief=TRUE)
+\end_layout
+
+\begin_layout Plain Layout
+
+# cleanup files
+\end_layout
+
+\begin_layout Plain Layout
+
+cleanup(ask=FALSE)
+\end_layout
+
+\begin_layout Plain Layout
+
+clean_admb("admbcjsre")
+\end_layout
+
+\begin_layout Plain Layout
+
+@
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+
+\size normal
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "markedWriteUpBib"
+
+\end_inset
+
+
+\size default
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+begin{landscape}
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+lstset{% general command to set parameter(s)
+\end_layout
+
+\begin_layout Plain Layout
+
+basicstyle=
+\backslash
+tiny, % print whole listing small
+\end_layout
+
+\begin_layout Plain Layout
+
+keywordstyle=
+\backslash
+color{black}
+\backslash
+bfseries
+\backslash
+underbar,
+\end_layout
+
+\begin_layout Plain Layout
+
+% underlined bold black keywords
+\end_layout
+
+\begin_layout Plain Layout
+
+identifierstyle=, % nothing happens
+\end_layout
+
+\begin_layout Plain Layout
+
+commentstyle=
+\backslash
+color{white}, % white comments
+\end_layout
+
+\begin_layout Plain Layout
+
+stringstyle=
+\backslash
+ttfamily, % typewriter type for strings
+\end_layout
+
+\begin_layout Plain Layout
+
+showstringspaces=false}
+\end_layout
+
+\end_inset
+
+
+\begin_inset listings
+inline false
+status open
+
+\begin_layout Plain Layout
+
+// Cormack-Jolly-Seber model with individual random effects for survival
+ (Phi) and capture probability (p)
+\end_layout
+
+\begin_layout Plain Layout
+
+// Each capture history must represent a single animal
+\end_layout
+
+\begin_layout Plain Layout
+
+// Jeff Laake; 15 Nov 2012
+\end_layout
+
+\begin_layout Plain Layout
+
+DATA_SECTION 
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int n;                        // number of capture histories
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int m;                        // number of capture occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_imatrix ch(1,n,1,m);          // capture history matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_ivector frst(1,n);            // occasion first seen for each history
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_ivector lst(1,n);             // occasion last seen for each history
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_ivector loc(1,n);             // 0 or 1, 1 if lost on capture at
+ last event
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix tint(1,n,1,m-1);       // time interval between occasions
+ for each history-interval
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int kphi;                     // number of columns in the design
+ matrix for Phi - survival
+\end_layout
+
+\begin_layout Plain Layout
+
+    int nrows;                         // number of entries in design matrix
+ m-1 values for each of n histories
+\end_layout
+
+\begin_layout Plain Layout
+
+    !! nrows=n*(m-1);
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix phidm(1,nrows,1,kphi); // design matrix for Phi
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int kp;                       // number of columns in the design
+ matrix for p - capture probability
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix pdm(1,nrows,1,kp);     // design matrix for p
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int K;                        // number of fixed Phi values 
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix PhiF(1,K,1,2);         // Phi fixed matrix with index in
+ first column and value in second column
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_int L;                        // number of fixed p values
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_matrix pF(1,L,1,2);           // p fixed matrix with index in first
+ column and value in second column
+\end_layout
+
+\begin_layout Plain Layout
+
+        
+\end_layout
+
+\begin_layout Plain Layout
+
+PARAMETER_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_vector phibeta(1,kphi,1);       // parameter vector for Phi
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_vector pbeta(1,kp,1);           // parameter vector for p
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_number phisigeps(2);   
+\end_layout
+
+\begin_layout Plain Layout
+
+                                       // sigma for random effect in phi;
+             
+\end_layout
+
+\begin_layout Plain Layout
+
+    init_number psigeps(2);   
+\end_layout
+
+\begin_layout Plain Layout
+
+                                       // sigma for random effect in p;
+             
+\end_layout
+
+\begin_layout Plain Layout
+
+    objective_function_value f;        // objective function - negative
+ log-likelihood
+\end_layout
+
+\begin_layout Plain Layout
+
+    random_effects_vector phiu(1,n,2);   // random effect for scale
+\end_layout
+
+\begin_layout Plain Layout
+
+    random_effects_vector pu(1,n,2);     // random effect for scale
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+TOP_OF_MAIN_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+
+  arrmblsize=5000000;                  // not sure how to set this as a
+ function of problem size
+\end_layout
+
+\begin_layout Plain Layout
+
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+PROCEDURE_SECTION
+\end_layout
+
+\begin_layout Plain Layout
+
+    int i;                             // index over observations
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(i=1;i<=n;i++)                  // loop over capture histories -
+ one per animal
+\end_layout
+
+\begin_layout Plain Layout
+
+    {
+\end_layout
+
+\begin_layout Plain Layout
+
+          ll_i(i,phisigeps,psigeps,phiu(i),pu(i),phibeta,pbeta);
+\end_layout
+
+\begin_layout Plain Layout
+
+    }
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+SEPARABLE_FUNCTION void ll_i(const int i, const dvariable& phisigeps,const
+ dvariable& psigeps,const dvariable& phiu,const dvariable& pu,const dvar_vector&
+ phibeta, const dvar_vector& pbeta )
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvar_vector phi(1,m);              // temp vector for Phis for each
+ occasion for a single history
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvar_vector p(1,m-1);              // temp vector for Phis for each
+ occasion for a single history
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvar_vector phicumprod(1,m);       // cummulative survival probability
+ across occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvar_vector cump(1,m);             // cummulative probability of being
+ seen across occasions
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvariable pch;                     // probability of capture history
+\end_layout
+
+\begin_layout Plain Layout
+
+    int i1,i2,j;                       // miscellaneous ints
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvariable phieps=phiu*exp(phisigeps);   // scaled re for phi
+\end_layout
+
+\begin_layout Plain Layout
+
+    dvariable peps=pu*exp(psigeps);         // scaled re for p 
+\end_layout
+
+\begin_layout Plain Layout
+
+                                                                   //  
+  
+\end_layout
+
+\begin_layout Plain Layout
+
+    phi=0;                                                         // set
+ all phi values to 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    phicumprod=1.0;                                                // set
+ cummulative survival to 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    cump=1.0;                                                      // set
+ cummulative p to 1
+\end_layout
+
+\begin_layout Plain Layout
+
+    i1=(m-1)*(i-1);                                                // compute
+ beginning index in design matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(j=frst(i)+1;j<=m;j++)                                      // loop
+ over occasions from frst to m
+\end_layout
+
+\begin_layout Plain Layout
+
+    {
+\end_layout
+
+\begin_layout Plain Layout
+
+       i2=i1+j;                                                    // increment
+ index in design matrix
+\end_layout
+
+\begin_layout Plain Layout
+
+       phi(j-1)=1/(1+exp(-phidm(i2-1)*phibeta-phieps));            // compute
+ phi for the interval
+\end_layout
+
+\begin_layout Plain Layout
+
+       if(tint(i,j-1)!=1)
+\end_layout
+
+\begin_layout Plain Layout
+
+          phi(j-1)=pow(phi(j-1),tint(i,j-1));                      // adjust
+ phi for the time interval length
+\end_layout
+
+\begin_layout Plain Layout
+
+       p(j-1)=1/(1+exp(-pdm(i2-1)*pbeta-peps));                    // compute
+ p for the occasion
+\end_layout
+
+\begin_layout Plain Layout
+
+       phicumprod(j)=phicumprod(j-1)*phi(j-1);                     // compute
+ cummulative survival
+\end_layout
+
+\begin_layout Plain Layout
+
+       cump(j)=cump(j-1)*((1-p(j-1))*(1-ch(i,j))+p(j-1)*ch(i,j));  // compute
+ cummulative capture probability
+\end_layout
+
+\begin_layout Plain Layout
+
+    }   
+\end_layout
+
+\begin_layout Plain Layout
+
+    pch=0.0;                                                       // initialize
+ prob of the capture history to 0
+\end_layout
+
+\begin_layout Plain Layout
+
+    for(j=lst(i);j<=((1-loc(i))*m+loc(i)*lst(i));j++)              // loop
+ over last occasion to m unless loss on capture
+\end_layout
+
+\begin_layout Plain Layout
+
+    {                                                              //  to
+ compute prob of the capture history 
+\end_layout
+
+\begin_layout Plain Layout
+
+       i2=i1+j;                                                    // index
+ occasion
+\end_layout
+
+\begin_layout Plain Layout
+
+       if(loc(i)==1)
+\end_layout
+
+\begin_layout Plain Layout
+
+          pch=pch+cump(j)*phicumprod(j);                           // probabilit
+y of history given possible last occasion alive
+\end_layout
+
+\begin_layout Plain Layout
+
+       else       
+\end_layout
+
+\begin_layout Plain Layout
+
+          pch=pch+cump(j)*phicumprod(j)*(1-phi(j));                // probabilit
+y of history given possible last occasion alive
+\end_layout
+
+\begin_layout Plain Layout
+
+    }   
+\end_layout
+
+\begin_layout Plain Layout
+
+    f-= log(pch+.0000000000000001);                                // sum
+ log-likelihood log(pr(ch))
+\end_layout
+
+\begin_layout Plain Layout
+
+    f -= -0.5*square(pu)-0.9189385332046727;                       // normal
+ random effect distr; constant is log(sqrt(2*pi))
+\end_layout
+
+\begin_layout Plain Layout
+
+    f -= -0.5*square(phiu)-0.9189385332046727;                     // normal
+ random effect distr; constant is log(sqrt(2*pi))
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
+
+\end_layout
+
+\end_inset
+
+
+\begin_inset ERT
+status open
+
+\begin_layout Plain Layout
+
+
+\backslash
+end{landscape}
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

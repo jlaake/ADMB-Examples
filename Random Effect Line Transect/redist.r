@@ -76,6 +76,9 @@ fx.eps=function(eps,x,par,w)
 	fx(x,sigma,w)*dnorm(eps,0,1)
 }
 
+simdata=function(n=500,beta=2,beta_eps=-1,w=Inf,
+		reject=TRUE,b=10000)
+{
 # n        - sample size
 # beta     - scale intercept
 # beta_eps - beta for random effect sigma
@@ -87,18 +90,16 @@ fx.eps=function(eps,x,par,w)
 #             rejection sampling
 #         
 # If reject==FALSE, it generates distances directly with 
-# rnorm but if this approach is used, the estimated beta with the
-# correct likelihood will not match the generating beta but 
+# rnorm but if this approach is used, the estimated beta with 
+# the correct likelihood will not match the generating beta but 
 # this is not bias in the usual sense. It will match the beta
 # from the incorrect likelihood.
-simdata=function(n=500,beta=2,beta_eps=-1,w=Inf,reject=TRUE,b=10000)
-{
 	if(reject)
 	{
 		if(w==Inf)
 			w=3*exp(beta+3*exp(beta_eps))
 		x=NULL
-        while(length(x)<n)
+		while(length(x)<n)
 		{
 			u=runif(b,0,w)
 			sigma=exp(beta+rnorm(b,0,1)*exp(beta_eps))
@@ -108,10 +109,36 @@ simdata=function(n=500,beta=2,beta_eps=-1,w=Inf,reject=TRUE,b=10000)
 		return(x[1:n])
 	}else
 	{
-		sigma=exp(beta+rnorm(n,0,1)*exp(beta_eps))
-		x=abs(rnorm(n,0,sigma))
-		return(x)
+		x=NULL
+		while(length(x)<n)
+		{
+			sigma=exp(beta+rnorm(b,0,1)*exp(beta_eps))
+			z=abs(rnorm(n,0,sigma))
+			x=c(x,z[z<w])
+		}
+		return(x[1:n])
 	}
+}
+fitdata=function(x,beta=2,beta_eps=-1,w=Inf,
+		weps=5,lower=beta/2,upper=2*beta,
+		wrong=FALSE,hessian=FALSE)
+{
+	n=length(x)
+	if(is.null(beta_eps))
+	{
+		# fit fixed scale model
+		model=optimize(flnl,lower=lower,upper=upper,
+				x=x,w=w,weps=weps)
+		model$par=model$minimum
+	}else
+	{
+#   fit random scale model 
+		model=optim(par=c(beta,beta_eps),
+				flnl,x=x,w=w,weps=weps,wrong=wrong,hessian=hessian)
+	}
+	model$x=x
+	model$w=w
+	return(list(model=model))
 }
 
 plotfit=function(result,nclass=NULL,weps=5,main=NULL)
@@ -164,12 +191,38 @@ results_random=plotfit(results_random,nclass=30)
 results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
 results_random_wrong=plotfit(results_random_wrong,nclass=30)
 
-x=simdata(n=500,w=Inf,beta_eps=-.5,reject=FALSE)
+x=simdata(n=500,w=Inf,beta_eps=2,reject=FALSE)
 par(mfrow=c(1,2)) 
-results_random=fitdata(x,w=Inf,beta_eps=-.5)
+results_random=fitdata(x,w=Inf,beta_eps=2)
 results_random=plotfit(results_random,nclass=30)
-results_random_wrong=fitdata(x,w=Inf,beta_eps=-.5,wrong=TRUE)
+results_random_wrong=fitdata(x,w=Inf,beta_eps=2,wrong=TRUE)
 results_random_wrong=plotfit(results_random_wrong,nclass=30)
+
+beta_eps=log(.5)
+beta=.2
+n=1000
+w=2
+u=runif(n,0,w)
+sigma=exp(beta+rnorm(n,0,1)*exp(beta_eps))
+seen=gx(u,sigma)>runif(n,0,1)
+x=u[seen]
+
+par(mfrow=c(1,2)) 
+system.time(results_random<-fitdata(x,w=2,beta_eps=log(.5),beta=.2,hessian=TRUE))
+results_random=plotfit(results_random,nclass=30)
+con=file("hnre_normalized.dat",open="wt")
+write(length(x),con,append=FALSE)
+write(2,con,append=TRUE)
+write(x,con,ncol=1,append=TRUE)
+compile_admb("hnre_normalized",re=T,verbose=T)
+system.time(run_admb("hnre_normalized",extra.args="-gh 10"))
+xx=read_admb("hnre_normalized")
+admb_results=results_random
+admb_results$model$par=c(xx$coeflist$beta,xx$coeflist$sigeps)
+dummy=plotfit(admb_results,nclass=30)
+dummy$Nhat
+results_random$Nhat
+
 
 
 results_fixed=fitdata(x,w=Inf,beta=1,beta_eps=NULL)
