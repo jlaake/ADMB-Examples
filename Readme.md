@@ -7,3 +7,5 @@ transect sampling random and mixed effect models are contained in the R package 
 
 PDF files describing each example can be found under Downloads. The TPL and DAT files are
 under each example sub-directory.
+
+You can download all of the source files in a [single zip](https://github.com/jlaake/ADMB-Examples/archive/master.zip).
