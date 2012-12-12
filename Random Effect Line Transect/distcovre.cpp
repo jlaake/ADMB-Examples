@@ -26,7 +26,7 @@ model_data::model_data(int argc,char * argv[]) : ad_comm(argc,argv)
 void model_parameters::initializationfunction(void)
 {
   sigma.set_initial_value(0.2);
-  beta.set_initial_value(0.6666667);
+  beta.set_initial_value(1.38);
 }
 
 model_parameters::model_parameters(int sz,int argc,char * argv[]) : 
@@ -50,18 +50,23 @@ void model_parameters::userfunction(void)
   f =0.0;
    int i, j;
    dvariable mu;
+   dvariable g;
    for (i=1;i<=pt;i++)
    {
     par_index=i;
     parmat(i)=reals(dm(i),beta(i),links(i));
    }
+   cout << "parmat = " << parmat << endl;
    f=0;
+   g=0;
    for (j=1;j<=n;j++)
    {
       obs_index=j;
-      mu=adromb(0,width,8);
-	  f-= log(h(xs(j))) - log(mu);
-	  f-= -0.5*square(u(1,j))-0.9189385332046727;
+    //  mu=adromb(0,width,8);
+	  f -= -0.5*square(u(1,j))-log(sqrt(2*PI));                         // log of std normal density for epsilon
+      f -= -log(sqrt(2*PI))-log(parmat(1,j))-0.5*square(xs(j)/parmat(1,j));        // log of f(x) for half-normal
+	//  f-= log(h(xs(j))) - log(mu);
+	//  f-= -0.5*square(u(1,j))-0.9189385332046727;
    }  
    cout << "beta = " << beta << endl;
    cout << "sigma = " << sigma << endl;   
@@ -143,11 +148,11 @@ int main(int argc,char * argv[])
 {
   ad_set_new_handler();
   ad_exit=&ad_boundf;
-  gradient_structure::set_MAX_NVAR_OFFSET(50502); 
+  gradient_structure::set_MAX_NVAR_OFFSET(1001001); 
   gradient_structure::set_NUM_DEPENDENT_VARIABLES(800);
-  gradient_structure::set_GRADSTACK_BUFFER_SIZE(100000);
+  gradient_structure::set_GRADSTACK_BUFFER_SIZE(900000);
   gradient_structure::set_CMPDIF_BUFFER_SIZE(1000000);
-  arrmblsize=500000;
+  arrmblsize=5000000;
     gradient_structure::set_NO_DERIVATIVES();
     gradient_structure::set_YES_SAVE_VARIABLES_VALUES();
   #if defined(__GNUDOS__) || defined(DOS386) || defined(__DPMI32__)  || \
@@ -205,18 +210,23 @@ void df1b2_parameters::user_function(void)
   f =0.0;
    int i, j;
    df1b2variable mu;
+   df1b2variable g;
    for (i=1;i<=pt;i++)
    {
     par_index=i;
     parmat(i)=reals(dm(i),beta(i),links(i));
    }
+   cout << "parmat = " << parmat << endl;
    f=0;
+   g=0;
    for (j=1;j<=n;j++)
    {
       obs_index=j;
-      mu=adromb(0,width,8);
-	  f-= log(h(xs(j))) - log(mu);
-	  f-= -0.5*square(u(1,j))-0.9189385332046727;
+    //  mu=adromb(0,width,8);
+	  f -= -0.5*square(u(1,j))-log(sqrt(2*PI));                         // log of std normal density for epsilon
+      f -= -log(sqrt(2*PI))-log(parmat(1,j))-0.5*square(xs(j)/parmat(1,j));        // log of f(x) for half-normal
+	//  f-= log(h(xs(j))) - log(mu);
+	//  f-= -0.5*square(u(1,j))-0.9189385332046727;
    }  
    cout << "beta = " << beta << endl;
    cout << "sigma = " << sigma << endl;   

@@ -11,37 +11,36 @@ DATA_SECTION
    int par_index;                     // index to parameter
 INITIALIZATION_SECTION
    sigma 0.2
-   beta 0.6666667
+   beta 1.38
 PARAMETER_SECTION
    init_matrix beta(1,pt,1,k,2);        // beta parameters for each parameter type
    init_bounded_vector sigma(1,pt,0.000001,5,1);
    matrix parmat(1,pt,1,n);           // matrix of parameter values; 1 to n and 1 to pt types of parameters
    random_effects_matrix u(1,pt,1,n);
    objective_function_value f;        // negative log-likelihood
-TOP_OF_MAIN_SECTION
-  gradient_structure::set_MAX_NVAR_OFFSET(50502); 
-  gradient_structure::set_NUM_DEPENDENT_VARIABLES(800);
-  gradient_structure::set_GRADSTACK_BUFFER_SIZE(100000);
-  gradient_structure::set_CMPDIF_BUFFER_SIZE(1000000);
-  arrmblsize=500000;
 PROCEDURE_SECTION
    int i, j;
    dvariable mu;
-//   funnel_dvariable mu;
+   dvariable g;
+// funnel_dvariable mu;
 // Create matrix of real parameter values which is pt rows and n columns
    for (i=1;i<=pt;i++)
    {
     par_index=i;
     parmat(i)=reals(dm(i),beta(i),links(i));
    }
+   cout << "parmat = " << parmat << endl;
 // loop over each observation computing sum of log-likelihood values
    f=0;
+   g=0;
    for (j=1;j<=n;j++)
    {
       obs_index=j;
-      mu=adromb(0,width,8);
-	  f-= log(h(xs(j))) - log(mu);
-	  f-= -0.5*square(u(1,j))-0.9189385332046727;
+    //  mu=adromb(0,width,8);
+	  f -= -0.5*square(u(1,j))-log(sqrt(2*PI));                         // log of std normal density for epsilon
+      f -= -log(sqrt(2*PI))-log(parmat(1,j))-0.5*square(xs(j)/parmat(1,j));        // log of f(x) for half-normal
+	//  f-= log(h(xs(j))) - log(mu);
+	//  f-= -0.5*square(u(1,j))-0.9189385332046727;
    }  
    cout << "beta = " << beta << endl;
    cout << "sigma = " << sigma << endl;   
@@ -51,7 +50,7 @@ PROCEDURE_SECTION
 //////////////////////////////   
 FUNCTION dvar_vector reals(dmatrix& dm, dvar_vector& beta, int ilink)
 // dm is the design matrix
-// beta is vector of parameters - length macthes ncol(dm)
+// beta is vector of parameters - length matches ncol(dm)
 // ilink is type of link function
 // u is random values
     dvar_vector tmp;
@@ -120,4 +119,9 @@ FUNCTION dvariable trapzd(double a,double b,int n,const dvariable& s)
     s=0.5*(s+(b-a)*sum/num_interval);
     return s;
   }
-
+TOP_OF_MAIN_SECTION
+  gradient_structure::set_MAX_NVAR_OFFSET(1001001); 
+  gradient_structure::set_NUM_DEPENDENT_VARIABLES(800);
+  gradient_structure::set_GRADSTACK_BUFFER_SIZE(900000);
+  gradient_structure::set_CMPDIF_BUFFER_SIZE(1000000);
+  arrmblsize=5000000;
