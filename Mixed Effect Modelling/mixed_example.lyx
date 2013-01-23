@@ -76,7 +76,7 @@ sweave
 \begin_body
 
 \begin_layout Title
-Building General Random Effect Models in ADMB
+Building General Random Effect Models with R and ADMB
 \end_layout
 
 \begin_layout Author
@@ -84,8 +84,16 @@ Jeff Laake, Hans Skaug and Devin Johnson
 \end_layout
 
 \begin_layout Standard
-The ADMB and Otter Research web sites provide examples of specific random
- effect models.
+The 
+\family typewriter
+\series bold
+\size small
+ADMB
+\family default
+\series default
+\size default
+ and Otter Research web sites provide examples of specific random effect
+ models.
  See 
 \begin_inset Flex URL
 status collapsed
@@ -109,9 +117,32 @@ http://www.admb-project.org/examples/miscellaneous/otter-reseach-collection
 \end_inset
 
 .
- However, none of these examples discuss how to build more general TPL files
- to accomodate a class of random effect models.
- The R package glmmadmb (
+ However, none of these examples discuss how to build more general 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ files to accommodate a class of random effect models.
+ The 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ package 
+\family typewriter
+\series bold
+\size small
+glmmadmb
+\family default
+\series default
+\size default
+ (
 \begin_inset Flex URL
 status collapsed
 
@@ -122,27 +153,182 @@ http://glmmadmb.r-forge.r-project.org/
 
 \end_inset
 
-) is an example where R is used with a single TPL file that can fit generalized
- linear mixed models for a wide range of distributions.
- By examining the R code and TPL file for glmmadmb, you can work out how
- to develop a general TPL file and use R code to build the structures ADMB
+) is an example where 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ is used with a single 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file that can fit generalized linear mixed models for a wide range of distribut
+ions.
+ By examining the 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ code and 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file for 
+\family typewriter
+\series bold
+\size small
+glmmadmb
+\family default
+\series default
+\size default
+, you can work out how to develop a general 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file and use 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ code to build the structures 
+\family typewriter
+\series bold
+\size small
+ADMB
+\family default
+\series default
+\size default
  needs to fit mixed effect models.
- However, glmmadmb is fairly complex and sorting through the code can be
- challenging.
+ However, 
+\family typewriter
+\series bold
+\size small
+glmmadmb
+\family default
+\series default
+\size default
+ is fairly complex and sorting through the code can be challenging.
  Here we provide a simpler example with comments to demonstrate the process
  so others can incorporate this into their model building software.
 \end_layout
 
 \begin_layout Standard
-We use the general modelling tools in R to create a DAT file that contains
- the structures needed for the TPL file for ADMB.
- We use the R2admb package as the R-ADMB interface.
- R and R2admb could be replaced with equivalent software that builds the
- DAT file but R is freely available and has a wealth of modelling and data
- manipulation tools.
+We use the general modeling tools in 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ to create a 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file that contains the structures needed for the TPL file for 
+\family typewriter
+\series bold
+\size small
+ADMB
+\family default
+\series default
+\size default
+.
+ We use the 
+\family typewriter
+\series bold
+\size small
+R2admb
+\family default
+\series default
+\size default
+ package as the 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ and 
+\family typewriter
+\series bold
+\size small
+ADMB
+\family default
+\series default
+\size default
+ interface.
+ 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ and 
+\family typewriter
+\series bold
+\size small
+R2admb
+\family default
+\series default
+\size default
+ could be replaced with equivalent software that builds the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file but 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ is freely available and has a wealth of modeling and data manipulation
+ tools.
  Using mixed logistic regression as an example, we'll begin by describing
- the TPL file structure to fit a random effects model for some data file
- and formula that are both specified by a user.
+ the
+\family typewriter
+\series bold
+\size small
+ TPL
+\family default
+\series default
+\size default
+ file structure to fit a random effects model for a user-specified dataframe
+ and formula.
 \end_layout
 
 \begin_layout Section*
@@ -150,11 +336,27 @@ ADMB Code
 \end_layout
 
 \begin_layout Standard
-We will describe the contents of the file mixed.tpl given in the Appendix.
+We will describe the contents of the file 
+\family typewriter
+\series bold
+\size small
+mixed.tpl
+\family default
+\series default
+\size default
+ given in the Appendix.
  This simple skeleton file could be modified to compute a different likelihood
- or could be extended to incorporate mixed-effects modelling for several
+ or could be extended to incorporate mixed-effects modeling for several
  parameters contained in a single likelihood.
- The TPL file is generalized to work with any data file or formula by specifying
+ The 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file is generalized to work with any data file or formula by specifying
  the model via design matrices that are passed as data.
  For mixed effect models, there is a design matrix for the fixed effect
  and one for the random effects.
@@ -163,9 +365,49 @@ We will describe the contents of the file mixed.tpl given in the Appendix.
 \end_layout
 
 \begin_layout Standard
-We'll describe the DAT structure with a simple illustrative example that
- is too small to use in practice.
- The variable y is the response and id, sex and time are all factor variables.
+We'll describe the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ structure with a simple illustrative example that is too small to use in
+ practice.
+ The variable 
+\family typewriter
+\series bold
+\size small
+y
+\family default
+\series default
+\size default
+ is the response and 
+\family typewriter
+\series bold
+\size small
+id
+\family default
+\series default
+\size default
+, 
+\family typewriter
+\series bold
+\size small
+sex
+\family default
+\series default
+\size default
+ and 
+\family typewriter
+\series bold
+\size small
+time
+\family default
+\series default
+\size default
+ are all factor variables.
 \begin_inset VSpace 0.25in
 \end_inset
 
@@ -463,13 +705,66 @@ F
 
 \begin_layout Standard
 \noindent
-Consider building a logistic regression model for the response y in which
- sex is a fixed effect and id (individual heterogeneity) is a random intercept
- for the response.
- We begin by describing the DATA_SECTION of the TPL file and show the contents
- below of the DAT file for this example.
- The variables in parentheses are the names used in the TPL file (Appendix)
- and we have used underscore to show the range of the vector or matrix (eg
+Consider building a logistic regression model for the response 
+\family typewriter
+\series bold
+\size small
+y
+\family default
+\series default
+\size default
+ in which 
+\family typewriter
+\series bold
+\size small
+sex
+\family default
+\series default
+\size default
+ is a fixed effect and 
+\family typewriter
+\series bold
+\size small
+id
+\family default
+\series default
+\size default
+ (individual heterogeneity) is a random intercept for the response.
+ We begin by describing the 
+\family typewriter
+\series bold
+\size small
+DATA_SECTION
+\family default
+\series default
+\size default
+ of the 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file and show the contents below of the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file for this example.
+ The variables in parentheses are the names used in the 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file (Appendix) and we have used underscore to show the range of the vector
+ or matrix (e.g.
  y_i, i=1 to n):
 \begin_inset VSpace 0.25in
 \end_inset
@@ -552,7 +847,7 @@ status open
 3
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 # number of columns in the random effect design matrix (krand)
 \end_layout
 
@@ -636,7 +931,8 @@ There is a single random effect variable with
 \shape italic
 nre
 \shape default
-=3 values (ie one for each of the 3 individuals).
+=3 values (ie.
+ one for each of the 3 individuals).
  The indices specify which random effect is used for the value in the random
  design matrix.
  For this model there are 3 parameters (
@@ -655,7 +951,7 @@ krand
 \begin_layout Standard
 \begin_inset Formula 
 \[
-L(\beta_{1},\beta_{2},\tau_{1}|\:\boldsymbol{y}\mathrm{)=\mathit{\prod_{i=1}^{6}p_{i}^{y_{i}}}(1-\mathit{p}_{\mathit{i}})^{(1-\mathit{y}_{i})}}
+L(\beta_{1},\beta_{2},\tau_{1},\boldsymbol{u}|\:\boldsymbol{y}\mathrm{)=\mathit{\prod_{i=1}^{6}p_{i}^{y_{i}}}(1-\mathit{p}_{\mathit{i}})^{(1-\mathit{y}_{i})}}
 \]
 
 \end_inset
@@ -906,127 +1202,337 @@ logit(
 \end_layout
 
 \begin_layout Standard
-The PARAMETER_SECTION contains a vector 
+The 
+\family typewriter
+\series bold
+\size small
+PARAMETER_SECTION
+\family default
+\series default
+\size default
+ contains a vector 
+\family typewriter
+\series bold
 \shape italic
+\size small
 Beta
+\family default
+\series default
 \shape default
+\size default
  which are the values of the fixed parameters from 1 to 
+\family typewriter
+\series bold
 \shape italic
+\size small
 kfixed
+\family default
+\series default
 \shape default
+\size default
  that are estimated in phase 1.
- It also contains a vector Tau which are the random parameters from 1 to
- 
+ It also contains a vector 
+\family typewriter
+\series bold
 \shape italic
+\size small
+Tau
+\family default
+\series default
+\shape default
+\size default
+ which are the random parameters from 1 to 
+\family typewriter
+\series bold
+\shape italic
+\size small
 krand
+\family default
+\series default
 \shape default
+\size default
  and a 
+\family typewriter
+\series bold
 \shape italic
+\size small
 random_effects_vector
+\family default
+\series default
 \shape default
+\size default
  from 1 to 
+\family typewriter
+\series bold
 \shape italic
+\size small
 nre
+\family default
+\series default
 \shape default
+\size default
 .
  The random effect parameters and values are estimated in phase 2.
  If there is no random component in the model, then the phase is set to
  -1 so it will be ignored and a fixed effects model is fitted.
  The negative log-likelihood value (
+\family typewriter
+\series bold
 \shape italic
+\size small
 objective_function_value
+\family default
+\series default
 \shape default
+\size default
 ) is held in 
+\family typewriter
+\series bold
 \shape italic
+\size small
 g
+\family default
+\series default
 \shape default
+\size default
 .
  
 \end_layout
 
 \begin_layout Standard
-The PROCEDURE_SECTION of the TPL file for computation of the objective function
- is fairly simple.
+The 
+\family typewriter
+\series bold
+\size small
+PROCEDURE_SECTION
+\family default
+\series default
+\size default
+ of the 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file for computation of the objective function is fairly simple.
  It contains a loop over each of the 
+\family typewriter
+\series bold
 \shape italic
+\size small
 nre
+\family default
+\series default
 \shape default
- random effects that calls the SEPARABLE_FUNCTION 
+\size default
+ random effects that calls the 
+\family typewriter
+\series bold
+\size small
+SEPARABLE_FUNCTION
+\family default
+\series default
+\size default
+ 
+\family typewriter
+\series bold
 \shape italic
+\size small
 n01_prior
+\family default
+\series default
 \shape default
+\size default
  which sums the negative log-likelihood of a standard normal distribution.
  That loop is only called if there are any random effects.
- The next loop is over each row in the data and it calls the SEPARABLE_FUNCTION
+ The next loop is over each row in the data and it calls the 
+\family typewriter
+\series bold
+\size small
+SEPARABLE_FUNCTION 
+\shape italic
+ll_i
+\shape default
  
-\shape italic
-ll_i
-\shape default
- to compute and sum the negative log-likelihood contribution for each response.
+\family default
+\series default
+\size default
+to compute and sum the negative log-likelihood contribution for each response.
  In the call to 
+\family typewriter
+\series bold
 \shape italic
+\size small
 ll_i
+\family default
+\series default
 \shape default
+\size default
  you must pass the parameters and the random effects used in the calculation.
  Notice that the code specifies 
+\family typewriter
+\series bold
 \shape italic
-u(randIndex(i)) 
+\size small
+u(randIndex(i))
+\family default
+\series default
+\size default
+ 
 \shape default
 which passes only the random effect values needed for the each row in the
  data.
  When used with the 
+\family typewriter
+\series bold
 \shape italic
+\size small
 -shess
+\family default
+\series default
 \shape default
- run argument this improves execution speed.
+\size default
+ run argument this improves execution speed (Skaug and Fournier 2011).
 \end_layout
 
 \begin_layout Standard
-The SEPARABLE_FUNCTION ll_i computes the value of mu which is 
+The 
+\family typewriter
+\series bold
+\size small
+SEPARABLE_FUNCTION
+\family default
+\series default
+\size default
+ 
+\family typewriter
+\series bold
 \shape italic
+\size small
+ll_i
+\family default
+\series default
+\shape default
+\size default
+ computes the value of mu which is 
+\family typewriter
+\series bold
+\shape italic
+\size small
 fixedDM(i)*Beta
+\family default
+\series default
 \shape default
+\size default
  plus 
+\family typewriter
+\series bold
 \shape italic
+\size small
 randDM(i,j)*u(j)*mfexp(Tau(j))
+\family default
+\series default
 \shape default
+\size default
  for each column in the random design matrix (
+\family typewriter
+\series bold
 \shape italic
+\size small
 krand
+\family default
+\series default
 \shape default
+\size default
 ).
- For our simple example, 
+ For our simple example,
+\family typewriter
+\series bold
+\size small
+ 
 \shape italic
 krand
+\family default
+\series default
 \shape default
-=1 and 
+\size default
+=1 and
+\family typewriter
+\series bold
+\size small
+ 
 \shape italic
 randDM(i,j)
+\family default
+\series default
 \shape default
-=1, so the code simplies to the calculations shown above.
+\size default
+=1, so the code simplifies to the calculations shown above.
  
 \end_layout
 
 \begin_layout Standard
 Now let's expand on the example with a model that has both an individual
  and temporal random intercept.
- The TPL file is the same and only the DAT file changes.
+ The 
+\family typewriter
+\series bold
+\size small
+TPL
+\family default
+\series default
+\size default
+ file is the same and only the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file changes.
  Now we have 
+\family typewriter
+\series bold
 \shape italic
+\size small
 nre
+\family default
+\series default
 \shape default
+\size default
 =5 random values (3 for 
+\family typewriter
+\series bold
 \shape italic
+\size small
 id
+\family default
+\series default
 \shape default
+\size default
  and 2 for 
+\family typewriter
+\series bold
 \shape italic
+\size small
 time
+\family default
+\series default
 \shape default
+\size default
 ) and we have 
+\family typewriter
+\series bold
 \shape italic
+\size small
 krand
+\family default
+\series default
 \shape default
+\size default
 =2 columns in the random design matrix, one for the intercept of each random
  effect.
 \end_layout
@@ -1114,7 +1620,7 @@ status open
 5
 \end_layout
 
-\begin_layout Standard
+\begin_layout Plain Layout
 # number of columns in the random effect design matrix (krand)
 \end_layout
 
@@ -1181,7 +1687,6 @@ status open
 
 \end_inset
 
-
  
 \end_layout
 
@@ -1195,20 +1700,56 @@ status open
 
 \begin_layout Standard
 The important design aspect is the use of a single random effect vector
- to contain the values for each type of random effect (eg 
+ to contain the values for each type of random effect (e.g.
+ 
+\family typewriter
+\series bold
 \shape italic
+\size small
 id
+\family default
+\series default
 \shape default
+\size default
  and 
+\family typewriter
+\series bold
 \shape italic
+\size small
 time
+\family default
+\series default
 \shape default
+\size default
 ).
  This is important because random effects must be passed as arguments to
- the SEPARABLE_FUNCTION.
+ the 
+\family typewriter
+\series bold
+\size small
+SEPARABLE_FUNCTION
+\family default
+\series default
+\size default
+.
  Had we decided to use a different vector for each type of random effect,
- we would have to change the definition of the SEPARABLE_FUNCTION and its
- call in the PROCEDURE_SECTION.
+ we would have to change the definition of the 
+\family typewriter
+\series bold
+\size small
+SEPARABLE_FUNCTION
+\family default
+\series default
+\size default
+ and its call in the 
+\family typewriter
+\series bold
+\size small
+PROCEDURE_SECTION
+\family default
+\series default
+\size default
+.
  Modification of the code is avoided by using a single vector and using
  indices to specify which to use with the random design matrix values.
  For this model there are 4 parameters (
@@ -1324,9 +1865,15 @@ time
 \noun default
 \color inherit
 ) and the values of 
+\family typewriter
+\series bold
 \shape italic
+\size small
 mu
+\family default
+\series default
 \shape default
+\size default
  are:
 \end_layout
 
@@ -1550,33 +2097,177 @@ R Code
 \end_layout
 
 \begin_layout Standard
-Now you certainly would not want to construct the DAT file by hand for anything
- other than a simple illustrative example like this one.
+Now you certainly would not want to construct the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file by hand for anything other than a simple illustrative example like
+ this one.
  It would be tedious and error prone.
- This is where R and the R package R2admb become an invaluable tool.
- We have used functions in R listed in the Appendix: 1) proc.form - parses
- a formula using the structure specified in the R package lme4, 2) mixed.model.adm
-b - calls proc.form with a formula and then with a data frame constructs
- the design matrices and indices needed for the DAT file, and 3) mixed.model.dat
- - writes the model components structures to the DAT file.
- The function 
-\shape italic
+ This is where 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ and the 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ package 
+\family typewriter
+\series bold
+\size small
+R2admb
+\family default
+\series default
+\size default
+ become an invaluable tool.
+ We have used functions in 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ listed in the Appendix: 1) 
+\family typewriter
+\series bold
+\size small
+proc.form
+\family default
+\series default
+\size default
+ - parses a formula using the structure specified in the 
+\family typewriter
+\series bold
+\size small
+R
+\family default
+\series default
+\size default
+ package 
+\family typewriter
+\series bold
+\size small
+lme4
+\family default
+\series default
+\size default
+, 2) 
+\family typewriter
+\series bold
+\size small
+mixed.model.admb
+\family default
+\series default
+\size default
+ - calls 
+\family typewriter
+\series bold
+\size small
+proc.form
+\family default
+\series default
+\size default
+ with a formula and then with a data frame constructs the design matrices
+ and indices needed for the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file, and 3) 
+\family typewriter
+\series bold
+\size small
 mixed.model.dat
+\family default
+\series default
+\size default
+ - writes the model components structures to the 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file.
+ The function 
+\family typewriter
+\series bold
+\shape italic
+\size small
+mixed.model.dat
+\family default
+\series default
 \shape default
- only writes out a mixed effect model structure and the complete DAT file.
- We chose to do this because it may be included as part of a DAT file that
- may have other components.
+\size default
+ only writes out a mixed effect model structure and not the complete 
+\family typewriter
+\series bold
+\size small
+DAT 
+\family default
+\series default
+\size default
+file.
+ We chose to do this because it may be included as part of a 
+\family typewriter
+\series bold
+\size small
+DAT
+\family default
+\series default
+\size default
+ file that may have other components.
  
 \end_layout
 
 \begin_layout Standard
 Below are code that construct a simulated data set, fit a mixed-effects
- logistic model with ADMB using the code described and then fit the same
- model with the function 
+ logistic model with 
+\family typewriter
+\series bold
+\size small
+ADMB
+\family default
+\series default
+\size default
+ using the code described and then fit the same model with the function
+ 
+\family typewriter
+\series bold
 \shape italic
+\size small
 lmer
+\family default
+\series default
 \shape default
- in the package lme4 to demonstrate that the same results are obtained.
+\size default
+ in the package 
+\family typewriter
+\series bold
+\size small
+lme4
+\family default
+\series default
+\size default
+ to demonstrate that the same results are obtained.
 \end_layout
 
 \begin_layout Standard
@@ -2467,7 +3158,38 @@ lme4res
 
 \end_layout
 
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+Skaug, H.
+ and D.
+ Fournier.
+ 2011.
+ Random effects in AD Model Builder: ADMB-RE User Guide.
+ Version 10.0.
+ 
+\begin_inset Flex URL
+status collapsed
+
+\begin_layout Plain Layout
+
+http://admb-project.googlecode.com/files/admbre-10.0-rev1.pdf
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \begin_inset ERT
 status open
 
@@ -2821,113 +3543,139 @@ inline false
 status open
 
 \begin_layout Plain Layout
+
 #' Mixed effect model formula parser
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
+
 #' Parses a mixed effect model in the lme4 structure of  ~fixed +(re1|g1)
  +...+(ren|gn)
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @param f formula for mixed effect mode in the form used in lme4; ~fixed
  +(re1|g1) +...+(ren|gn)
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @return A list with elements fix.model and re.model.
  fix.model contains the formula for the fixed effects;
 \end_layout
 
 \begin_layout Plain Layout
+
 #' re.model contains elements sub, the grouping formula and model the design
  formula for the
 \end_layout
 
 \begin_layout Plain Layout
+
 #' random effect.
  Each formula is of type character and must be wrapped with as.formula in
  use with model.matrix
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @author Devin Johnson <devin.johnson@@noaa.gov>
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
+
 proc.form <- function(f){
 \end_layout
 
 \begin_layout Plain Layout
+
 	tms <- terms(f)
 \end_layout
 
 \begin_layout Plain Layout
+
 	tms.lab <- attr(tms, "term.labels")
 \end_layout
 
 \begin_layout Plain Layout
+
 	tms.lst <- strsplit(tms.lab, rep(" | ",length(tms.lab)), fixed=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 	fix.var <- attr(tms, "term.labels")[sapply(tms.lst, "length")==1]
 \end_layout
 
 \begin_layout Plain Layout
+
 	if(length(fix.var)==0) 
 \end_layout
 
 \begin_layout Plain Layout
+
 		fix.model="~1"
 \end_layout
 
 \begin_layout Plain Layout
+
 	else
 \end_layout
 
 \begin_layout Plain Layout
+
 		fix.model <- paste("~ ",paste(fix.var, collapse=" + "))
 \end_layout
 
 \begin_layout Plain Layout
+
 	re.lst <- tms.lst[sapply(tms.lst, "length")==2]
 \end_layout
 
 \begin_layout Plain Layout
+
 	if(length(re.lst)==0) re.model <- NULL
 \end_layout
 
 \begin_layout Plain Layout
+
 	else{
 \end_layout
 
 \begin_layout Plain Layout
+
 		re.model <- lapply(re.lst, function(x){list(model=paste("~",x[1]), sub=paste("~"
 ,x[2],"-1", collapse=""))})
 \end_layout
 
 \begin_layout Plain Layout
+
 	}
 \end_layout
 
 \begin_layout Plain Layout
+
 	return(list(fix.model=fix.model, re.model=re.model))
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
@@ -2950,171 +3698,210 @@ inline false
 status open
 
 \begin_layout Plain Layout
-#' Mixed effect model contstruction
+
+#' Mixed effect model construction
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
+
 #' Functions that develop structures needed for a mixed effect model
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
+
 #' mixed.model.admb - creates design matrices and supporting index matrices
 \end_layout
 
 \begin_layout Plain Layout
+
 #' for use of mixed model in ADMB
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
-#' mixed.model.
-dat
-\lang english
- - writes to data file (con) for fixed and random effect stuctures
+
+#' mixed.model.dat - writes to data file (con) for fixed and random effect
+ stuctures
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
-#' @usage mixed.model.admb(f,data)
+
+#' @aliases mixed.model.admb mixed.model.dat
 \end_layout
 
 \begin_layout Plain Layout
-#'           mixed.model.
-dat
-\lang english
-(x,con)
+
+#' @usage mixed.model.admb(formula,data)
 \end_layout
 
 \begin_layout Plain Layout
-#' @param f formula for mixed effect mode in the form used in lme4; ~fixed
- +(re1|g1) +...+(ren|gn)
+
+#'        mixed.model.dat(x,con)
 \end_layout
 
 \begin_layout Plain Layout
+
+#' @param formula formula for mixed effect mode in the form used in lme4;
+ ~fixed +(re1|g1) +...+(ren|gn)
+\end_layout
+
+\begin_layout Plain Layout
+
 #' @param data dataframe used to construct the design matrices from the
  formula
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @param x list structure created by mixed.model.admb
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @param con connection to data file which contents will be appended
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @return mixed.model.admb returns a list with elements fixed.dm, the design
  matrix for
 \end_layout
 
 \begin_layout Plain Layout
+
 #' the fixed effects; re.dm, a combined design matrix for all of the random
  effects; and 
 \end_layout
 
 \begin_layout Plain Layout
+
 #' re.indices, matrix of indices into a single vector of random effects to
  be applied to the 
 \end_layout
 
 \begin_layout Plain Layout
+
 #' design matrix location.
 \end_layout
 
 \begin_layout Plain Layout
+
 #' @author Jeff Laake <jeff.laake@@noaa.gov>
 \end_layout
 
 \begin_layout Plain Layout
+
 #' 
 \end_layout
 
 \begin_layout Plain Layout
+
 mixed.model.admb=function(formula,data)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
 # parse formula for fixed and random effects
 \end_layout
 
 \begin_layout Plain Layout
+
   mlist=proc.form(formula)
 \end_layout
 
 \begin_layout Plain Layout
+
 # construct design matrix for fixed effects
 \end_layout
 
 \begin_layout Plain Layout
+
   fixed.dm=model.matrix(as.formula(mlist$fix.model),data)
 \end_layout
 
 \begin_layout Plain Layout
+
 # remainder of code is for random effects unless NULL
 \end_layout
 
 \begin_layout Plain Layout
+
   reindex=0
 \end_layout
 
 \begin_layout Plain Layout
+
   re.dm=NULL
 \end_layout
 
 \begin_layout Plain Layout
+
   re.indices=NULL
 \end_layout
 
 \begin_layout Plain Layout
+
   if(!is.null(mlist$re.model))
 \end_layout
 
 \begin_layout Plain Layout
+
   {
 \end_layout
 
 \begin_layout Plain Layout
+
 #    Loop over each random effect component
 \end_layout
 
 \begin_layout Plain Layout
+
      for(i in 1:length(mlist$re.model))
 \end_layout
 
 \begin_layout Plain Layout
+
 	 {
 \end_layout
 
 \begin_layout Plain Layout
+
 #      Make sure each variable used to define random effect group is a factor
  variable
 \end_layout
 
 \begin_layout Plain Layout
+
   	   if(!all(sapply(model.frame(as.formula(mlist$re.model[[i]]$sub),data),is.factor
 )))
 \end_layout
 
 \begin_layout Plain Layout
+
 	       stop(paste("
 \backslash
 n one or more variables in",mlist$re.model[[i]]$sub,"is not a factor variable
@@ -3123,225 +3910,276 @@ n"))
 \end_layout
 
 \begin_layout Plain Layout
+
        else
 \end_layout
 
 \begin_layout Plain Layout
+
 	   {
 \end_layout
 
 \begin_layout Plain Layout
+
 #         Compute design matrix for grouping variables
 \end_layout
 
 \begin_layout Plain Layout
+
           zz=model.matrix(as.formula(mlist$re.model[[i]]$sub),data)
 \end_layout
 
 \begin_layout Plain Layout
+
 #         Not all combinations of factor variable(s) may be used so only
  use those observed in the data
 \end_layout
 
 \begin_layout Plain Layout
+
 		  used.columns=which(colSums(zz)>0)
 \end_layout
 
 \begin_layout Plain Layout
+
 		  nre=length(used.columns)
 \end_layout
 
 \begin_layout Plain Layout
+
 #         Compute the indices for this particular grouping structure and
  reindex if any missing
 \end_layout
 
 \begin_layout Plain Layout
+
           indices=rowSums(zz*col(zz))
 \end_layout
 
 \begin_layout Plain Layout
+
 		  if(nre!=ncol(zz))indices=match(indices,used.columns)
 \end_layout
 
 \begin_layout Plain Layout
+
 #         Compute the design matrix for the random effect formula
 \end_layout
 
 \begin_layout Plain Layout
+
           zz=model.matrix(as.formula(mlist$re.model[[i]]$model),data)
 \end_layout
 
 \begin_layout Plain Layout
+
 #         Now shift indices to refer to a single vector of random effects
  across all re groupings
 \end_layout
 
 \begin_layout Plain Layout
+
 		  ng=max(indices)
 \end_layout
 
 \begin_layout Plain Layout
+
           indices=matrix(indices,nrow=length(indices),ncol=ncol(zz))+reindex
 \end_layout
 
 \begin_layout Plain Layout
+
           indices=t(t(indices)+cumsum(c(0,rep(ng,ncol(zz)-1))))
 \end_layout
 
 \begin_layout Plain Layout
+
           reindex=max(indices)	
 \end_layout
 
 \begin_layout Plain Layout
+
 #         Bind random effect design matrices (re.dm), indices into random
  effects vector (re.indices) and
 \end_layout
 
 \begin_layout Plain Layout
+
 #         index for the random effect sigma parameter (re.sigma)
 \end_layout
 
 \begin_layout Plain Layout
+
 		  re.dm=cbind(re.dm,zz)
 \end_layout
 
 \begin_layout Plain Layout
+
 		  re.indices=cbind(re.indices,indices)
 \end_layout
 
 \begin_layout Plain Layout
+
 	   }
 \end_layout
 
 \begin_layout Plain Layout
+
 	 }
 \end_layout
 
 \begin_layout Plain Layout
+
    }
 \end_layout
 
 \begin_layout Plain Layout
+
    return(list(fixed.dm=fixed.dm,re.dm=re.dm,re.indices=re.indices))
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
 \begin_layout Plain Layout
-mixed.model.
-dat
-\lang english
-=function(x,con)
+
+mixed.model.dat=function(x,con)
 \end_layout
 
 \begin_layout Plain Layout
+
 {
 \end_layout
 
 \begin_layout Plain Layout
+
 	# number of columns of fixed dm
 \end_layout
 
 \begin_layout Plain Layout
+
 	write(ncol(x$fixed.dm),con,append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 	# fixed dm
 \end_layout
 
 \begin_layout Plain Layout
+
 	write(t(x$fixed.dm),con,ncolumns=ncol(x$fixed.dm),append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
     if(!is.null(x$re.dm))
 \end_layout
 
 \begin_layout Plain Layout
+
 	{
 \end_layout
 
 \begin_layout Plain Layout
+
 		# number of random effects
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(max(x$re.indices),con,append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 		# number of columns of re dm
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(ncol(x$re.dm),con,append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 		# re dm
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(t(x$re.dm),con,ncolumns=ncol(x$re.dm),append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 		# re indices
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(t(x$re.indices),con,ncolumns=ncol(x$re.indices),append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 	}
 \end_layout
 
 \begin_layout Plain Layout
+
 	else
 \end_layout
 
 \begin_layout Plain Layout
+
 	{
 \end_layout
 
 \begin_layout Plain Layout
+
 		# 0 no re
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(0,con,append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 		# number of re =0
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(0,con,append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 		# number of columns of re dm=0
 \end_layout
 
 \begin_layout Plain Layout
+
 		write(0,con,append=TRUE)
 \end_layout
 
 \begin_layout Plain Layout
+
 	}
 \end_layout
 
 \begin_layout Plain Layout
-    return(NULL)	
+
+    invisible()	
 \end_layout
 
 \begin_layout Plain Layout
+
 }
 \end_layout
 
