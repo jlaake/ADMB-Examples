@@ -14,20 +14,20 @@ DATA_SECTION
     !! nrows=n*(m-1);
     init_int kphi;                                    // number of fixed effect columns in the design matrix for Phi - survival
     init_matrix phi_fixedDM(1,nrows,1,kphi);          // phi fixed effect DM
-    init_int phi_krand;                               // number of columns in phi random effect DM
-	int phi_phase;                                    // phase for re for phi; -1 if no random effects
-	!! phi_phase=2;
-	!! if(phi_krand==0)phi_phase=-1;
     init_int phi_nre;                                 // number of random effects for phi
+	int phi_phase;                                    // phase for re for phi; -1 if no random effects                                   
+	!! phi_phase=2;                                   
+	!! if(phi_nre==0)phi_phase=-1;
+    init_int phi_krand;                               // number of columns in phi random effect DM
     init_matrix phi_randDM(1,nrows,1,phi_krand);      // phi random effect DM
     init_imatrix phi_randIndex(1,nrows,1,phi_krand);  // phi random effect indices for DM
     init_int kp;                                      // number of fixed effect columns in the design matrix for p - capture probability
     init_matrix p_fixedDM(1,nrows,1,kp);              // p fixed effect DM
-    init_int p_krand;                                  // number of columns in p random effect DM
-	int p_phase;                                      // phase for re for p; -1 if no random effects
-	!! p_phase=2;
-	!! if(p_krand==0)p_phase=-1;
     init_int p_nre;                                   // number of random effects for p
+	int p_phase;                                      // phase for re for p; -1 if no random effects
+	!! p_phase=2;                                     
+	!! if(p_nre==0)p_phase=-1;
+    init_int p_krand;                                 // number of columns in p random effect DM
     init_matrix p_randDM(1,nrows,1,p_krand);          // p random effect DM
     init_imatrix p_randIndex(1,nrows,1,p_krand);      // p random effect indices for DM
     init_int K;                                       // number of fixed Phi values 
@@ -81,7 +81,7 @@ SEPARABLE_FUNCTION void ll_i(const int i, const dvar_vector& phi_sigma,const dva
     i1=(m-1)*(i-1);  	                                           // compute beginning index in design matrix
     for(j=frst(i)+1;j<=m;j++)                                      // loop over occasions from frst to m
     {
-       i2=i1+j-1;                                                    // increment index in design matrix
+       i2=i1+j-1;                                                  // increment index in design matrix
        // phi computation // 
        mu=phi_fixedDM(i)*phi_beta;                                 // fixed portion of mean   
        if(phi_krand > 0)	                                       // random portion of mean if any

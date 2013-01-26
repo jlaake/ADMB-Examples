@@ -4140,16 +4140,6 @@ mixed.model.dat=function(x,con)
 
 \begin_layout Plain Layout
 
-		# 0 no re
-\end_layout
-
-\begin_layout Plain Layout
-
-		write(0,con,append=TRUE)
-\end_layout
-
-\begin_layout Plain Layout
-
 		# number of re =0
 \end_layout
 

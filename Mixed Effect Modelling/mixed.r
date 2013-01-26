@@ -109,8 +109,6 @@ mixed.model.dat=function(x,con)
 	}
 	else
 	{
-		# 0 no re
-		write(0,con,append=TRUE)
 		# number of re =0
 		write(0,con,append=TRUE)
 		# number of columns of re dm=0
