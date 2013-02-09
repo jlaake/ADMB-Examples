@@ -12,6 +12,7 @@ DATA_SECTION
     init_matrix tint(1,n,1,m-1);                      // time interval between occasions for each history-interval
     int nrows;                                        // number of entries in design matrix m-1 values for each of n histories
     !! nrows=n*(m-1);
+
     init_int kphi;                                    // number of fixed effect columns in the design matrix for Phi - survival
     init_matrix phi_fixedDM(1,nrows,1,kphi);          // phi fixed effect DM
     init_int phi_nre;                                 // number of random effects for phi
@@ -21,6 +22,12 @@ DATA_SECTION
     init_int phi_krand;                               // number of columns in phi random effect DM
     init_matrix phi_randDM(1,nrows,1,phi_krand);      // phi random effect DM
     init_imatrix phi_randIndex(1,nrows,1,phi_krand);  // phi random effect indices for DM
+    int nphicounts;                                   // number of counts for phi random effects by id
+	!! nphicounts=n;
+    !! if(phi_nre==0)nphicounts=0;
+    init_ivector phi_counts(1,nphicounts);            // count of phi random effect indices by id
+    init_imatrix phi_idIndex(1,nphicounts,1,phi_counts);  // phi random effect indices by id
+
     init_int kp;                                      // number of fixed effect columns in the design matrix for p - capture probability
     init_matrix p_fixedDM(1,nrows,1,kp);              // p fixed effect DM
     init_int p_nre;                                   // number of random effects for p
@@ -30,6 +37,12 @@ DATA_SECTION
     init_int p_krand;                                 // number of columns in p random effect DM
     init_matrix p_randDM(1,nrows,1,p_krand);          // p random effect DM
     init_imatrix p_randIndex(1,nrows,1,p_krand);      // p random effect indices for DM
+    int npcounts;                                     // number of counts for p random effects by id
+	!! npcounts=n;
+    !! if(p_nre==0)npcounts=0;
+    init_ivector p_counts(1,npcounts);                // count of p random effect indices by id
+    init_imatrix p_idIndex(1,npcounts,1,p_counts);    // p random effect indices by id
+
     init_int K;                                       // number of fixed Phi values 
     init_matrix PhiF(1,K,1,2);                        // Phi fixed matrix with index in first column and value in second column
     init_int L;                                       // number of fixed p values
