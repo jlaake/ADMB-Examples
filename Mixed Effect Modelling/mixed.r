@@ -44,7 +44,7 @@ proc.form <- function(f){
 #' the fixed effects; re.dm, a combined design matrix for all of the random effects; and 
 #' re.indices, matrix of indices into a single vector of random effects to be applied to the 
 #' design matrix location.
-#' @author Jeff Laake <jeff.laake@@noaa.gov>
+#' @author Jeff Laake 
 #' 
 mixed.model.admb=function(formula,data)
 {

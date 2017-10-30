@@ -2519,7 +2519,7 @@ proc.form <- function(f){
 
 \begin_layout Plain Layout
 
-#' @author Jeff Laake <jeff.laake@@noaa.gov>
+#' @author Jeff Laake 
 \end_layout
 
 \begin_layout Plain Layout
@@ -3805,7 +3805,7 @@ status open
 
 \begin_layout Plain Layout
 
-#' @author Jeff Laake <jeff.laake@@noaa.gov>
+#' @author Jeff Laake 
 \end_layout
 
 \begin_layout Plain Layout
